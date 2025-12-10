@@ -1,0 +1,47 @@
+{
+  "common": {
+    "welcome": "Chào mừng",
+    "home": "Trang chủ",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "submit": "Gửi",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "search": "Tìm kiếm",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công"
+  },
+  "auth": {
+    "loginTitle": "Đăng nhập vào tài khoản",
+    "loginDescription": "Nhập email và mật khẩu để đăng nhập",
+    "registerTitle": "Tạo tài khoản",
+    "registerDescription": "Nhập thông tin để tạo tài khoản",
+    "forgotPassword": "Quên mật khẩu?",
+    "noAccount": "Chưa có tài khoản?",
+    "hasAccount": "Đã có tài khoản?",
+    "signInWithGoogle": "Đăng nhập với Google",
+    "orContinueWith": "Hoặc tiếp tục với",
+    "emailPlaceholder": "Nhập email của bạn",
+    "passwordPlaceholder": "Nhập mật khẩu",
+    "confirmPasswordPlaceholder": "Xác nhận mật khẩu",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "termsAndConditions": "Tôi đồng ý với các điều khoản và điều kiện"
+  },
+  "home": {
+    "title": "Chào mừng đến với Next.js",
+    "description": "Bắt đầu bằng cách chỉnh sửa",
+    "clickMe": "Nhấn vào tôi"
+  },
+  "metadata": {
+    "title": "Ứng dụng Next.js",
+    "description": "Ứng dụng Next.js hiện đại với hỗ trợ đa ngôn ngữ"
+  }
+}
+

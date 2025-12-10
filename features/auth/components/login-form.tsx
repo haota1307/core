@@ -1,33 +1,39 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import Link from "next/link";
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import Image from 'next/image';
+import { LocaleLink } from '@/components/locale-link';
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<'div'>) {
+  const t = useTranslations('auth');
+  const tCommon = useTranslations('common');
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>Login with your Google account</CardDescription>
+          <CardTitle className="text-xl">{t('loginTitle')}</CardTitle>
+          <CardDescription>{t('loginDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <form>
@@ -40,45 +46,47 @@ export function LoginForm({
                     width={20}
                     height={20}
                   />
-                  Login with Google
+                  {t('signInWithGoogle')}
                 </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                Or continue with
+                {t('orContinueWith')}
               </FieldSeparator>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">{tCommon('email')}</FieldLabel>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder={t('emailPlaceholder')}
                   required
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
+                  <FieldLabel htmlFor="password">
+                    {tCommon('password')}
+                  </FieldLabel>
                   <a
                     href="#"
                     className="ml-auto text-sm underline-offset-4 hover:underline"
                   >
-                    Forgot your password?
+                    {t('forgotPassword')}
                   </a>
                 </div>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('passwordPlaceholder')}
                   required
                 />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit">{tCommon('login')}</Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account?{" "}
-                  <Link href="/auth/register" className="text-primary">
-                    Create an account
-                  </Link>
+                  {t('noAccount')}{' '}
+                  <LocaleLink href="/auth/register" className="text-primary">
+                    {tCommon('register')}
+                  </LocaleLink>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -86,8 +94,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        {t('termsAndConditions')}
       </FieldDescription>
     </div>
   );

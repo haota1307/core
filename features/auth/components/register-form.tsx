@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,20 +17,21 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import Link from "next/link";
+import { LocaleLink } from "@/components/locale-link";
 
 export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const t = useTranslations("auth");
+  const tCommon = useTranslations("common");
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Create your account</CardTitle>
-          <CardDescription>
-            Enter your email below to create your account
-          </CardDescription>
+          <CardTitle className="text-xl">{t("registerTitle")}</CardTitle>
+          <CardDescription>{t("registerDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form>
@@ -37,25 +41,37 @@ export function RegisterForm({
                 <Input id="name" type="text" placeholder="John Doe" required />
               </Field>
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">{tCommon("email")}</FieldLabel>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder={t("emailPlaceholder")}
                   required
                 />
               </Field>
               <Field>
                 <Field className="grid grid-cols-2 gap-4">
                   <Field>
-                    <FieldLabel htmlFor="password">Password</FieldLabel>
-                    <Input id="password" type="password" required />
+                    <FieldLabel htmlFor="password">
+                      {tCommon("password")}
+                    </FieldLabel>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder={t("passwordPlaceholder")}
+                      required
+                    />
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="confirm-password">
-                      Confirm Password
+                      {tCommon("confirmPassword")}
                     </FieldLabel>
-                    <Input id="confirm-password" type="password" required />
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder={t("confirmPasswordPlaceholder")}
+                      required
+                    />
                   </Field>
                 </Field>
                 <FieldDescription>
@@ -63,12 +79,12 @@ export function RegisterForm({
                 </FieldDescription>
               </Field>
               <Field>
-                <Button type="submit">Create Account</Button>
+                <Button type="submit">{tCommon("register")}</Button>
                 <FieldDescription className="text-center">
-                  Already have an account?{" "}
-                  <Link href="/auth/login" className="text-primary">
-                    Login
-                  </Link>
+                  {t("hasAccount")}{" "}
+                  <LocaleLink href="/auth/login" className="text-primary">
+                    {tCommon("login")}
+                  </LocaleLink>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -76,8 +92,7 @@ export function RegisterForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        {t("termsAndConditions")}
       </FieldDescription>
     </div>
   );

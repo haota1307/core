@@ -1,0 +1,47 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "home": "Home",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success"
+  },
+  "auth": {
+    "loginTitle": "Login to your account",
+    "loginDescription": "Enter your email and password to login",
+    "registerTitle": "Create an account",
+    "registerDescription": "Enter your information to create an account",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "signInWithGoogle": "Sign in with Google",
+    "orContinueWith": "Or continue with",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "rememberMe": "Remember me",
+    "termsAndConditions": "I agree to the terms and conditions"
+  },
+  "home": {
+    "title": "Welcome to Next.js",
+    "description": "Get started by editing",
+    "clickMe": "Click me"
+  },
+  "metadata": {
+    "title": "Next.js App",
+    "description": "A modern Next.js application with i18n support"
+  }
+}
+
