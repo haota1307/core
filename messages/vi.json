@@ -75,7 +75,7 @@
       "overview": "Bảng điều khiển",
       "analytics": "Phân tích",
       "reports": "Báo cáo",
-      "users": "Người dùng & Phân quyền",
+      "users": "Người dùng",
       "usersList": "Danh sách người dùng",
       "roles": "Vai trò",
       "permissions": "Quyền hạn",
@@ -112,6 +112,81 @@
   "metadata": {
     "title": "Ứng dụng Next.js",
     "description": "Ứng dụng Next.js hiện đại với hỗ trợ đa ngôn ngữ"
+  },
+  "users": {
+    "title": "Người dùng",
+    "description": "Quản lý người dùng và vai trò trong hệ thống",
+    "addNew": "Thêm người dùng mới",
+    "searchPlaceholder": "Tìm kiếm người dùng...",
+    "noUsersFound": "Không tìm thấy người dùng",
+    "noName": "Chưa có tên",
+    "noRole": "Chưa có vai trò",
+    "selectedRows": "hàng đã chọn",
+    "columnsToggle": "Cột",
+    "toggleColumns": "Hiển thị cột",
+    "pagination": {
+      "previous": "Trước",
+      "next": "Sau",
+      "page": "Trang",
+      "of": "của",
+      "rowsSelected": "hàng đã chọn"
+    },
+    "dialog": {
+      "createTitle": "Tạo người dùng mới",
+      "createDescription": "Thêm người dùng mới vào hệ thống với email và mật khẩu",
+      "editTitle": "Chỉnh sửa người dùng",
+      "editDescription": "Cập nhật thông tin người dùng và phân quyền",
+      "deleteTitle": "Bạn có chắc chắn?",
+      "deleteDescription": "Hành động này sẽ xóa vĩnh viễn người dùng. Không thể hoàn tác.",
+      "cancel": "Hủy",
+      "delete": "Xóa"
+    },
+    "columns": {
+      "name": "Tên",
+      "email": "Email",
+      "role": "Vai trò",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "filters": {
+      "status": "Trạng thái",
+      "role": "Vai trò"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "pending": "Chờ xác nhận",
+      "inactive": "Không hoạt động"
+    },
+    "form": {
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "name": "Tên",
+      "namePlaceholder": "Nguyễn Văn A",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu",
+      "passwordKeepCurrent": "(để trống để giữ nguyên)",
+      "passwordDescription": "Phải có ít nhất 8 ký tự bao gồm chữ hoa, chữ thường và số",
+      "role": "Vai trò",
+      "roleSelect": "Chọn vai trò",
+      "roleDescription": "Gán vai trò để quản lý quyền của người dùng",
+      "createButton": "Tạo người dùng",
+      "updateButton": "Cập nhật người dùng",
+      "cancel": "Hủy"
+    },
+    "actions": {
+      "label": "Thao tác",
+      "copyId": "Sao chép ID người dùng",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "reset": "Đặt lại"
+    },
+    "messages": {
+      "createSuccess": "Tạo người dùng thành công",
+      "updateSuccess": "Cập nhật người dùng thành công",
+      "deleteSuccess": "Xóa người dùng thành công",
+      "createError": "Tạo người dùng thất bại",
+      "updateError": "Cập nhật người dùng thất bại",
+      "deleteError": "Xóa người dùng thất bại"
+    }
   }
 }
-

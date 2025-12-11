@@ -75,7 +75,7 @@
       "overview": "Overview",
       "analytics": "Analytics",
       "reports": "Reports",
-      "users": "Users & Access",
+      "users": "Users",
       "usersList": "Users",
       "roles": "Roles",
       "permissions": "Permissions",
@@ -112,5 +112,81 @@
   "metadata": {
     "title": "Next.js App",
     "description": "A modern Next.js application with i18n support"
+  },
+  "users": {
+    "title": "Users",
+    "description": "Manage users and their roles in the system",
+    "addNew": "Add New User",
+    "searchPlaceholder": "Search users...",
+    "noUsersFound": "No users found",
+    "noName": "No name",
+    "noRole": "No role",
+    "selectedRows": "row(s) selected",
+    "columnsToggle": "Columns",
+    "toggleColumns": "Toggle columns",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page",
+      "of": "of",
+      "rowsSelected": "row(s) selected"
+    },
+    "dialog": {
+      "createTitle": "Create New User",
+      "createDescription": "Add a new user to the system with email and password",
+      "editTitle": "Edit User",
+      "editDescription": "Update user information and role assignment",
+      "deleteTitle": "Are you sure?",
+      "deleteDescription": "This will permanently delete the user. This action cannot be undone.",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "filters": {
+      "status": "Status",
+      "role": "Role"
+    },
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "inactive": "Inactive"
+    },
+    "form": {
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "name": "Name",
+      "namePlaceholder": "John Doe",
+      "password": "Password",
+      "passwordPlaceholder": "Enter password",
+      "passwordKeepCurrent": "(leave blank to keep current)",
+      "passwordDescription": "Must be at least 8 characters with uppercase, lowercase and number",
+      "role": "Role",
+      "roleSelect": "Select a role",
+      "roleDescription": "Assign a role to manage user permissions",
+      "createButton": "Create User",
+      "updateButton": "Update User",
+      "cancel": "Cancel"
+    },
+    "actions": {
+      "label": "Actions",
+      "copyId": "Copy user ID",
+      "edit": "Edit",
+      "delete": "Delete",
+      "reset": "Reset"
+    },
+    "messages": {
+      "createSuccess": "User created successfully",
+      "updateSuccess": "User updated successfully",
+      "deleteSuccess": "User deleted successfully",
+      "createError": "Failed to create user",
+      "updateError": "Failed to update user",
+      "deleteError": "Failed to delete user"
+    }
   }
 }

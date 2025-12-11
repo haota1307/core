@@ -163,7 +163,10 @@ export const createHttpClient = (config: HttpClientConfig) => {
       () => undefined
     );
 
-    const isUnauthorized = response.status === 401 || response.status === 403;
+    // 401 = token invalid/expired, should try refresh
+    // 403 = token valid but insufficient permissions, should NOT logout
+    const isUnauthorized = response.status === 401;
+    const isForbidden = response.status === 403;
 
     if (isUnauthorized && !retrying && config.refreshToken) {
       const refreshedToken = await config.refreshToken();
@@ -173,6 +176,8 @@ export const createHttpClient = (config: HttpClientConfig) => {
       }
     }
 
+    // Only trigger logout on 401 (authentication failure)
+    // 403 means authenticated but not authorized (permission denied)
     if (isUnauthorized) {
       await config.onUnauthorized?.(response.status);
     }

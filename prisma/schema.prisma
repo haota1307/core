@@ -20,13 +20,15 @@ model User {
   password      String
   emailVerified DateTime?
   image         String?
+  roleId        String?
+  role          Role?          @relation(fields: [roleId], references: [id], onDelete: SetNull)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   deletedAt     DateTime?
   refreshTokens RefreshToken[]
-  posts         Post[]
 
   @@index([email])
+  @@index([roleId])
   @@index([deletedAt])
 }
 
@@ -45,17 +47,44 @@ model RefreshToken {
   @@index([expiresAt])
 }
 
-model Post {
-  id        String    @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean   @default(false)
-  authorId  String
-  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+model Role {
+  id              String           @id @default(cuid())
+  name            String           @unique
+  description     String?
+  isSystem        Boolean          @default(false)
+  users           User[]
+  rolePermissions RolePermission[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  deletedAt       DateTime?
 
-  @@index([authorId])
+  @@index([deletedAt])
+}
+
+model Permission {
+  id              String           @id @default(cuid())
+  code            String           @unique
+  description     String?
+  rolePermissions RolePermission[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  deletedAt       DateTime?
+
+  @@index([deletedAt])
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
   @@index([deletedAt])
 }

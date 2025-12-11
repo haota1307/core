@@ -22,9 +22,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user
+    // Find user with role info
     const user = await prisma.user.findUnique({
       where: { email, deletedAt: null },
+      include: {
+        role: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+      },
     });
 
     if (!user) {
@@ -74,6 +83,8 @@ export async function POST(request: NextRequest) {
         email: user.email,
         name: user.name,
         image: user.image,
+        roleId: user.roleId,
+        role: user.role,
       },
     });
   } catch (error) {

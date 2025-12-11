@@ -15,7 +15,10 @@ export async function POST(request: NextRequest) {
 
     if (!name || !email || !password) {
       return NextResponse.json(
-        { code: "MISSING_FIELDS", message: "Name, email and password are required" },
+        {
+          code: "MISSING_FIELDS",
+          message: "Name, email and password are required",
+        },
         { status: 400 }
       );
     }
@@ -35,12 +38,18 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Get default "User" role
+    const defaultRole = await prisma.role.findUnique({
+      where: { name: "User" },
+    });
+
+    // Create user with default role
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
+        roleId: defaultRole?.id, // Assign default User role
       },
     });
 
