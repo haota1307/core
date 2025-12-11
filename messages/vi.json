@@ -34,6 +34,49 @@
     "rememberMe": "Ghi nhớ đăng nhập",
     "termsAndConditions": "Tôi đồng ý với các điều khoản và điều kiện"
   },
+  "nav": {
+    "navigation": "Điều hướng",
+    "quickLinks": "Truy cập nhanh",
+    "actions": {
+      "viewProject": "Xem liên kết",
+      "shareProject": "Chia sẻ liên kết",
+      "deleteProject": "Xóa liên kết",
+      "more": "Xem thêm"
+    },
+    "items": {
+      "dashboard": "Tổng quan",
+      "overview": "Bảng điều khiển",
+      "analytics": "Phân tích",
+      "reports": "Báo cáo",
+      "users": "Người dùng & Phân quyền",
+      "usersList": "Danh sách người dùng",
+      "roles": "Vai trò",
+      "permissions": "Quyền hạn",
+      "content": "Quản lý nội dung",
+      "posts": "Bài viết",
+      "pages": "Trang",
+      "media": "Thư viện media",
+      "categories": "Danh mục",
+      "traffic": "Lưu lượng truy cập",
+      "events": "Sự kiện",
+      "conversions": "Chuyển đổi",
+      "settings": "Cài đặt",
+      "general": "Tổng quan",
+      "appearance": "Giao diện",
+      "integrations": "Tích hợp",
+      "security": "Bảo mật",
+      "auditLogs": "Nhật ký kiểm tra",
+      "apiKeys": "Khóa API",
+      "support": "Trung tâm hỗ trợ"
+    },
+    "user": {
+      "upgrade": "Nâng cấp Pro",
+      "account": "Tài khoản",
+      "billing": "Thanh toán",
+      "notifications": "Thông báo",
+      "logout": "Đăng xuất"
+    }
+  },
   "home": {
     "title": "Chào mừng đến với Next.js",
     "description": "Bắt đầu bằng cách chỉnh sửa",

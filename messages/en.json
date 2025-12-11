@@ -34,6 +34,49 @@
     "rememberMe": "Remember me",
     "termsAndConditions": "I agree to the terms and conditions"
   },
+  "nav": {
+    "navigation": "Navigation",
+    "quickLinks": "Quick Links",
+    "actions": {
+      "viewProject": "View Link",
+      "shareProject": "Share Link",
+      "deleteProject": "Delete Link",
+      "more": "More"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "overview": "Overview",
+      "analytics": "Analytics",
+      "reports": "Reports",
+      "users": "Users & Access",
+      "usersList": "Users",
+      "roles": "Roles",
+      "permissions": "Permissions",
+      "content": "Content Management",
+      "posts": "Posts",
+      "pages": "Pages",
+      "media": "Media Library",
+      "categories": "Categories",
+      "traffic": "Traffic",
+      "events": "Events",
+      "conversions": "Conversions",
+      "settings": "Settings",
+      "general": "General",
+      "appearance": "Appearance",
+      "integrations": "Integrations",
+      "security": "Security",
+      "auditLogs": "Audit Logs",
+      "apiKeys": "API Keys",
+      "support": "Support Center"
+    },
+    "user": {
+      "upgrade": "Upgrade to Pro",
+      "account": "Account",
+      "billing": "Billing",
+      "notifications": "Notifications",
+      "logout": "Log out"
+    }
+  },
   "home": {
     "title": "Welcome to Next.js",
     "description": "Get started by editing",
