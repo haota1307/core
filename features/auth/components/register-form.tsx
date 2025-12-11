@@ -18,6 +18,10 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { LocaleLink } from "@/components/locale-link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createAuthSchemas, type RegisterInput } from "../schemas";
+import { useRegister } from "../hooks/use-auth";
 
 export function RegisterForm({
   className,
@@ -25,6 +29,22 @@ export function RegisterForm({
 }: React.ComponentProps<"div">) {
   const t = useTranslations("auth");
   const tCommon = useTranslations("common");
+  const tAll = useTranslations();
+
+  const { registerSchema } = createAuthSchemas((key: string) => tAll(key));
+  const registerMutation = useRegister();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterInput>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  const onSubmit = (data: RegisterInput) => {
+    registerMutation.mutate(data);
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -34,11 +54,21 @@ export function RegisterForm({
           <CardDescription>{t("registerDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="name">Full Name</FieldLabel>
-                <Input id="name" type="text" placeholder="John Doe" required />
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  {...register("name")}
+                />
+                {errors.name && (
+                  <FieldDescription className="text-destructive">
+                    {errors.name.message}
+                  </FieldDescription>
+                )}
               </Field>
               <Field>
                 <FieldLabel htmlFor="email">{tCommon("email")}</FieldLabel>
@@ -46,8 +76,13 @@ export function RegisterForm({
                   id="email"
                   type="email"
                   placeholder={t("emailPlaceholder")}
-                  required
+                  {...register("email")}
                 />
+                {errors.email && (
+                  <FieldDescription className="text-destructive">
+                    {errors.email.message}
+                  </FieldDescription>
+                )}
               </Field>
               <Field>
                 <Field className="grid grid-cols-2 gap-4">
@@ -59,8 +94,13 @@ export function RegisterForm({
                       id="password"
                       type="password"
                       placeholder={t("passwordPlaceholder")}
-                      required
+                      {...register("password")}
                     />
+                    {errors.password && (
+                      <FieldDescription className="text-destructive">
+                        {errors.password.message}
+                      </FieldDescription>
+                    )}
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="confirm-password">
@@ -70,8 +110,13 @@ export function RegisterForm({
                       id="confirm-password"
                       type="password"
                       placeholder={t("confirmPasswordPlaceholder")}
-                      required
+                      {...register("confirmPassword")}
                     />
+                    {errors.confirmPassword && (
+                      <FieldDescription className="text-destructive">
+                        {errors.confirmPassword.message}
+                      </FieldDescription>
+                    )}
                   </Field>
                 </Field>
                 <FieldDescription>
@@ -79,7 +124,11 @@ export function RegisterForm({
                 </FieldDescription>
               </Field>
               <Field>
-                <Button type="submit">{tCommon("register")}</Button>
+                <Button type="submit" disabled={registerMutation.isPending}>
+                  {registerMutation.isPending
+                    ? tCommon("loading")
+                    : tCommon("register")}
+                </Button>
                 <FieldDescription className="text-center">
                   {t("hasAccount")}{" "}
                   <LocaleLink href="/auth/login" className="text-primary">

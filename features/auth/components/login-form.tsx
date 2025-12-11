@@ -1,42 +1,62 @@
-'use client';
+"use client";
 
-import { useTranslations } from 'next-intl';
-import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import Image from 'next/image';
-import { LocaleLink } from '@/components/locale-link';
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import { LocaleLink } from "@/components/locale-link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { createAuthSchemas, type LoginInput } from "../schemas";
+import { useLogin } from "../hooks/use-auth";
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<'div'>) {
-  const t = useTranslations('auth');
-  const tCommon = useTranslations('common');
+}: React.ComponentProps<"div">) {
+  const t = useTranslations("auth");
+  const tCommon = useTranslations("common");
+  const tAll = useTranslations();
+
+  const { loginSchema } = createAuthSchemas((key: string) => tAll(key));
+  const loginMutation = useLogin();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginInput>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = (data: LoginInput) => {
+    loginMutation.mutate(data);
+  };
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">{t('loginTitle')}</CardTitle>
-          <CardDescription>{t('loginDescription')}</CardDescription>
+          <CardTitle className="text-xl">{t("loginTitle")}</CardTitle>
+          <CardDescription>{t("loginDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
                 <Button variant="outline" type="button">
@@ -46,46 +66,60 @@ export function LoginForm({
                     width={20}
                     height={20}
                   />
-                  {t('signInWithGoogle')}
+                  {t("signInWithGoogle")}
                 </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
-                {t('orContinueWith')}
+                {t("orContinueWith")}
               </FieldSeparator>
               <Field>
-                <FieldLabel htmlFor="email">{tCommon('email')}</FieldLabel>
+                <FieldLabel htmlFor="email">{tCommon("email")}</FieldLabel>
                 <Input
                   id="email"
                   type="email"
-                  placeholder={t('emailPlaceholder')}
-                  required
+                  placeholder={t("emailPlaceholder")}
+                  {...register("email")}
                 />
+                {errors.email && (
+                  <FieldDescription className="text-destructive">
+                    {errors.email.message}
+                  </FieldDescription>
+                )}
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">
-                    {tCommon('password')}
+                    {tCommon("password")}
                   </FieldLabel>
                   <a
                     href="#"
                     className="ml-auto text-sm underline-offset-4 hover:underline"
                   >
-                    {t('forgotPassword')}
+                    {t("forgotPassword")}
                   </a>
                 </div>
                 <Input
                   id="password"
                   type="password"
-                  placeholder={t('passwordPlaceholder')}
-                  required
+                  placeholder={t("passwordPlaceholder")}
+                  {...register("password")}
                 />
+                {errors.password && (
+                  <FieldDescription className="text-destructive">
+                    {errors.password.message}
+                  </FieldDescription>
+                )}
               </Field>
               <Field>
-                <Button type="submit">{tCommon('login')}</Button>
+                <Button type="submit" disabled={loginMutation.isPending}>
+                  {loginMutation.isPending
+                    ? tCommon("loading")
+                    : tCommon("login")}
+                </Button>
                 <FieldDescription className="text-center">
-                  {t('noAccount')}{' '}
+                  {t("noAccount")}{" "}
                   <LocaleLink href="/auth/register" className="text-primary">
-                    {tCommon('register')}
+                    {tCommon("register")}
                   </LocaleLink>
                 </FieldDescription>
               </Field>
@@ -94,7 +128,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        {t('termsAndConditions')}
+        {t("termsAndConditions")}
       </FieldDescription>
     </div>
   );

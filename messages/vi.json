@@ -32,7 +32,34 @@
     "passwordPlaceholder": "Nhập mật khẩu",
     "confirmPasswordPlaceholder": "Xác nhận mật khẩu",
     "rememberMe": "Ghi nhớ đăng nhập",
-    "termsAndConditions": "Tôi đồng ý với các điều khoản và điều kiện"
+    "termsAndConditions": "Tôi đồng ý với các điều khoản và điều kiện",
+    "validation": {
+      "emailRequired": "Email là bắt buộc",
+      "emailInvalid": "Định dạng email không hợp lệ",
+      "passwordRequired": "Mật khẩu là bắt buộc",
+      "passwordMinLength": "Mật khẩu phải có ít nhất 8 ký tự",
+      "passwordMaxLength": "Mật khẩu không được vượt quá 100 ký tự",
+      "confirmPasswordRequired": "Vui lòng xác nhận mật khẩu",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "nameRequired": "Tên là bắt buộc",
+      "nameMinLength": "Tên phải có ít nhất 2 ký tự",
+      "nameMaxLength": "Tên không được vượt quá 100 ký tự"
+    },
+    "errors": {
+      "INVALID_CREDENTIALS": "Email hoặc mật khẩu không đúng",
+      "MISSING_CREDENTIALS": "Email và mật khẩu là bắt buộc",
+      "EMAIL_EXISTS": "Email đã tồn tại",
+      "MISSING_FIELDS": "Tất cả các trường là bắt buộc",
+      "INVALID_TOKEN": "Token không hợp lệ hoặc đã hết hạn",
+      "MISSING_TOKEN": "Token là bắt buộc",
+      "USER_NOT_FOUND": "Không tìm thấy người dùng",
+      "SERVER_ERROR": "Lỗi máy chủ. Vui lòng thử lại sau.",
+      "UNKNOWN_ERROR": "Đã xảy ra lỗi. Vui lòng thử lại."
+    },
+    "success": {
+      "loginSuccess": "Đăng nhập thành công",
+      "registerSuccess": "Đăng ký thành công"
+    }
   },
   "nav": {
     "navigation": "Điều hướng",

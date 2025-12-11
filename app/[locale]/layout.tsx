@@ -1,20 +1,22 @@
-import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { routing } from '@/i18n/routing';
-import { ThemeProvider } from '@/components/theme-provider';
-import '../globals.css';
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ReactQueryProvider } from "@/lib/query-client";
+import "../globals.css";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export function generateStaticParams() {
@@ -27,24 +29,24 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  
+
   // You can load translations here for metadata
   const messages = await getMessages({ locale });
   const metadata = messages.metadata as any;
 
   return {
-    title: metadata?.title || 'Next.js App',
-    description: metadata?.description || 'A modern Next.js application',
+    title: metadata?.title || "Next.js App",
+    description: metadata?.description || "A modern Next.js application",
     alternates: {
       canonical: `/${locale}`,
       languages: {
-        en: '/en',
-        vi: '/vi',
+        en: "/en",
+        vi: "/vi",
       },
     },
     openGraph: {
       locale: locale,
-      type: 'website',
+      type: "website",
     },
   };
 }
@@ -73,12 +75,18 @@ export default async function LocaleLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <ThemeProvider attribute="class" defaultTheme="dark">
-            {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            disableTransitionOnChange
+          >
+            <ReactQueryProvider>
+              <Toaster />
+              {children}
+            </ReactQueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
   );
 }
-
