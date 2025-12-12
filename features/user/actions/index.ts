@@ -17,8 +17,25 @@ export async function getUsersAction(query: GetUsersQuery) {
     params.append("page", query.page.toString());
     params.append("limit", query.limit.toString());
     if (query.search) params.append("search", query.search);
-    if (query.roleId) params.append("roleId", query.roleId);
-    if (query.status) params.append("status", query.status);
+    
+    // Support multiple roleIds
+    if (query.roleId) {
+      if (Array.isArray(query.roleId)) {
+        query.roleId.forEach((id) => params.append("roleId", id));
+      } else {
+        params.append("roleId", query.roleId);
+      }
+    }
+    
+    // Support multiple statuses
+    if (query.status) {
+      if (Array.isArray(query.status)) {
+        query.status.forEach((s) => params.append("status", s));
+      } else {
+        params.append("status", query.status);
+      }
+    }
+    
     if (query.sortBy) params.append("sortBy", query.sortBy);
     if (query.sortOrder) params.append("sortOrder", query.sortOrder);
 

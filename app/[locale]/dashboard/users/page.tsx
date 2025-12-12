@@ -42,8 +42,13 @@ const UsersPage = () => {
     page,
     limit: 10,
     search,
-    status: statusFilter[0] as any, // Take first selected status
-    roleId: roleFilter[0], // Take first selected role
+    // Send all selected filters (support multiple values)
+    status: statusFilter.length > 0 
+      ? (statusFilter.length === 1 ? statusFilter[0] : statusFilter) as any
+      : undefined,
+    roleId: roleFilter.length > 0
+      ? (roleFilter.length === 1 ? roleFilter[0] : roleFilter)
+      : undefined,
     sortBy,
     sortOrder,
   });

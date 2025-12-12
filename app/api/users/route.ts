@@ -21,37 +21,66 @@ export const GET = withPermission(
       // Search
       const search = searchParams.get("search") || "";
 
-      // Filters
-      const roleId = searchParams.get("roleId");
-      const status = searchParams.get("status"); // "active" | "pending" | "inactive"
+      // Filters - support multiple values
+      const roleIds = searchParams.getAll("roleId"); // Get all roleId params
+      const statuses = searchParams.getAll("status"); // Get all status params
 
       // Sorting
       const sortBy = searchParams.get("sortBy") || "createdAt";
       const sortOrder = searchParams.get("sortOrder") || "desc";
 
-      // Build where clause
-      const where: any = {
-        deletedAt: null,
-      };
+      // Build where clause with AND logic for combining filters
+      const whereConditions: any[] = [
+        { deletedAt: null }, // Always include soft delete filter
+      ];
 
+      // Search condition: (email contains OR name contains)
       if (search) {
-        where.OR = [
-          { email: { contains: search, mode: "insensitive" } },
-          { name: { contains: search, mode: "insensitive" } },
-        ];
+        whereConditions.push({
+          OR: [
+            { email: { contains: search, mode: "insensitive" } },
+            { name: { contains: search, mode: "insensitive" } },
+          ],
+        });
       }
 
-      if (roleId) {
-        where.roleId = roleId;
+      // Filter by roleId(s) - support multiple roleIds
+      if (roleIds.length > 0) {
+        if (roleIds.length === 1) {
+          whereConditions.push({ roleId: roleIds[0] });
+        } else {
+          whereConditions.push({ roleId: { in: roleIds } });
+        }
       }
 
-      if (status === "active") {
-        where.emailVerified = { not: null };
-      } else if (status === "pending") {
-        where.emailVerified = null;
-      } else if (status === "inactive") {
-        where.emailVerified = null;
+      // Filter by status(es) - support multiple statuses
+      if (statuses.length > 0) {
+        const statusConditions: any[] = [];
+        
+        statuses.forEach((status) => {
+          if (status === "active") {
+            statusConditions.push({ emailVerified: { not: null } });
+          } else if (status === "pending") {
+            statusConditions.push({ emailVerified: null });
+          } else if (status === "inactive") {
+            statusConditions.push({ emailVerified: null });
+          }
+        });
+
+        if (statusConditions.length > 0) {
+          // If multiple statuses, use OR logic
+          if (statusConditions.length === 1) {
+            whereConditions.push(statusConditions[0]);
+          } else {
+            whereConditions.push({ OR: statusConditions });
+          }
+        }
       }
+
+      // Combine all conditions with AND
+      const where = whereConditions.length === 1 
+        ? whereConditions[0]
+        : { AND: whereConditions };
 
       // Build orderBy
       const orderBy: any = {};

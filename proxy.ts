@@ -13,32 +13,39 @@ const intlMiddleware = createMiddleware(routing);
 
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const method = request.method;
 
-  // Get access token from cookies
-  const accessToken = request.cookies.get("accessToken")?.value;
-  const isAuthenticated = !!accessToken;
+  // Only perform redirects on GET/HEAD requests
+  // POST/PUT/DELETE/PATCH requests should pass through
+  const shouldCheckRedirects = method === "GET" || method === "HEAD";
 
-  // Check if the current path (without locale) is protected
-  const isProtectedRoute = protectedRoutes.some((route) =>
-    pathname.includes(route)
-  );
+  if (shouldCheckRedirects) {
+    // Get access token from cookies
+    const accessToken = request.cookies.get("accessToken")?.value;
+    const isAuthenticated = !!accessToken;
 
-  // Check if the current path (without locale) is an auth route
-  const isAuthRoute = authRoutes.some((route) => pathname.includes(route));
+    // Check if the current path (without locale) is protected
+    const isProtectedRoute = protectedRoutes.some((route) =>
+      pathname.includes(route)
+    );
 
-  // Redirect to login if accessing protected route without authentication
-  if (isProtectedRoute && !isAuthenticated) {
-    const locale = pathname.split("/")[1] || routing.defaultLocale;
-    const loginUrl = new URL(`/${locale}/auth/login`, request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
+    // Check if the current path (without locale) is an auth route
+    const isAuthRoute = authRoutes.some((route) => pathname.includes(route));
 
-  // Redirect to dashboard if accessing auth routes while authenticated
-  if (isAuthRoute && isAuthenticated) {
-    const locale = pathname.split("/")[1] || routing.defaultLocale;
-    const dashboardUrl = new URL(`/${locale}/dashboard`, request.url);
-    return NextResponse.redirect(dashboardUrl);
+    // Redirect to login if accessing protected route without authentication
+    if (isProtectedRoute && !isAuthenticated) {
+      const locale = pathname.split("/")[1] || routing.defaultLocale;
+      const loginUrl = new URL(`/${locale}/auth/login`, request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Redirect to dashboard if accessing auth routes while authenticated
+    if (isAuthRoute && isAuthenticated) {
+      const locale = pathname.split("/")[1] || routing.defaultLocale;
+      const dashboardUrl = new URL(`/${locale}/dashboard`, request.url);
+      return NextResponse.redirect(dashboardUrl);
+    }
   }
 
   // Continue with i18n middleware

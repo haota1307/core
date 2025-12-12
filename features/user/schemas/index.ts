@@ -41,8 +41,11 @@ export const getUsersQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
   limit: z.coerce.number().int().positive().max(100).default(10),
   search: z.string().optional(),
-  roleId: z.string().optional(),
-  status: z.enum(["active", "pending", "inactive"]).optional(),
+  roleId: z.union([z.string(), z.array(z.string())]).optional(),
+  status: z.union([
+    z.enum(["active", "pending", "inactive"]),
+    z.array(z.enum(["active", "pending", "inactive"])),
+  ]).optional(),
   sortBy: z.string().optional(),
   sortOrder: z.enum(["asc", "desc"]).optional(),
 });

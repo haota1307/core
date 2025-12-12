@@ -56,7 +56,7 @@ export function LoginForm({
           <CardDescription>{t("loginDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <FieldGroup>
               <Field>
                 <Button variant="outline" type="button">
