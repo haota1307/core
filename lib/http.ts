@@ -231,6 +231,7 @@ export const createHttpClient = (config: HttpClientConfig) => {
   };
 };
 
+import { AuthResponse } from "@/features/auth/actions";
 import {
   getAccessToken,
   getRefreshToken,
@@ -255,29 +256,18 @@ export const http = createHttpClient({
     if (!storedRefreshToken) return null;
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL ?? ""}/api/auth/refresh`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken: storedRefreshToken }),
-          credentials: "include",
-        }
-      );
+      const res = await http.post<AuthResponse>(`/api/auth/refresh`, {
+        refreshToken: storedRefreshToken,
+      });
 
-      if (!res.ok) {
+      if (!res.accessToken || !res.refreshToken) {
         // Refresh failed, clear tokens
         clearTokens();
         return null;
       }
 
-      const json = (await res.json()) as {
-        accessToken?: string;
-        refreshToken?: string;
-      };
-
-      const newAccessToken = json?.accessToken ?? null;
-      const newRefreshToken = json?.refreshToken;
+      const newAccessToken = res.accessToken ?? null;
+      const newRefreshToken = res.refreshToken;
 
       if (newAccessToken && newRefreshToken) {
         storeTokens(newAccessToken, newRefreshToken);

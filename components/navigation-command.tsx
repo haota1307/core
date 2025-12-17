@@ -76,6 +76,7 @@ export function NavigationCommand() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (!event.key) return; // Guard against undefined key
       const key = event.key.toLowerCase();
       if ((event.metaKey || event.ctrlKey) && (key === "f" || key === "k")) {
         event.preventDefault();

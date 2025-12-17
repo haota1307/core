@@ -14,7 +14,7 @@ import { useHasPermission } from "@/lib/hooks/use-permissions";
 import type { SortingState } from "@tanstack/react-table";
 
 const UsersPage = () => {
-  const hasViewPermission = useHasPermission("users.view");
+  const { hasPermission: hasViewPermission, loading: permissionsLoading } = useHasPermission("users.view");
   const tCommon = useTranslations("common");
   const t = useTranslations("users");
 
@@ -80,6 +80,15 @@ const UsersPage = () => {
   });
 
   // Check permission
+  if (permissionsLoading) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <p className="text-sm text-muted-foreground">{tCommon("loading")}</p>
+      </div>
+    );
+  }
+
   if (!hasViewPermission) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4">

@@ -22,6 +22,11 @@ const VALID_PERMISSIONS = [
   "permissions.manage",
   "dashboard.view",
   "dashboard.analytics",
+  "media.view",
+  "media.upload",
+  "media.edit",
+  "media.delete",
+  "media.manage",
 ];
 
 async function main() {

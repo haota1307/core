@@ -140,7 +140,7 @@ export function UserForm({ user, onSubmit, isLoading, onCancel }: UserFormProps)
               <FormLabel>{t("role")}</FormLabel>
               <Select
                 onValueChange={field.onChange}
-                defaultValue={field.value}
+                defaultValue={field.value || undefined}
                 disabled={isLoading || rolesLoading}
               >
                 <FormControl>

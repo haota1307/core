@@ -94,7 +94,8 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
         },
         {
           title: tNavItems("media"),
-          url: "/dashboard/content/media",
+          url: "/dashboard/media",
+          permission: "media.view",
         },
         {
           title: tNavItems("categories"),

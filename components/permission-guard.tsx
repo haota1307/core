@@ -28,16 +28,20 @@ export function PermissionGuard({
   fallback = null,
   children,
 }: PermissionGuardProps) {
-  const hasPermission = useHasPermission(permission || "");
-  const hasAnyPermission = useHasAnyPermission(permissions || []);
+  const { hasPermission: hasSinglePermission, loading: singleLoading } = useHasPermission(permission || "");
+  const { hasPermission: hasAnyPermission, loading: anyLoading } = useHasAnyPermission(permissions || []);
 
   // Check permission
   if (permission) {
-    return hasPermission ? <>{children}</> : <>{fallback}</>;
+    // While loading, hide the content (don't show fallback)
+    if (singleLoading) return null;
+    return hasSinglePermission ? <>{children}</> : <>{fallback}</>;
   }
 
   // Check any of permissions (OR logic)
   if (permissions && permissions.length > 0) {
+    // While loading, hide the content (don't show fallback)
+    if (anyLoading) return null;
     return hasAnyPermission ? <>{children}</> : <>{fallback}</>;
   }
 

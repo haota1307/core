@@ -17,7 +17,8 @@ import type { SortingState } from "@tanstack/react-table";
 const PermissionsPage = () => {
   const t = useTranslations("permissions");
   const tCommon = useTranslations("common");
-  const hasViewPermission = useHasPermission("permissions.view");
+  const { hasPermission: hasViewPermission, loading: permissionsLoading } =
+    useHasPermission("permissions.view");
 
   // State for pagination, search, and filters
   const [page, setPage] = useState(1);
@@ -29,16 +30,20 @@ const PermissionsPage = () => {
     updaterOrValue: SortingState | ((old: SortingState) => SortingState)
   ) => {
     const newSorting =
-      typeof updaterOrValue === "function" ? updaterOrValue(sorting) : updaterOrValue;
+      typeof updaterOrValue === "function"
+        ? updaterOrValue(sorting)
+        : updaterOrValue;
     setSorting(newSorting);
   };
 
   // State for dialogs
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [editingPermission, setEditingPermission] =
-    useState<PermissionResponse | undefined>();
-  const [deletingPermission, setDeletingPermission] =
-    useState<PermissionResponse | undefined>();
+  const [editingPermission, setEditingPermission] = useState<
+    PermissionResponse | undefined
+  >();
+  const [deletingPermission, setDeletingPermission] = useState<
+    PermissionResponse | undefined
+  >();
 
   // Build query params
   const sortBy = sorting[0]?.id;
@@ -66,6 +71,15 @@ const PermissionsPage = () => {
   });
 
   // Check permission
+  if (permissionsLoading) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <p className="text-sm text-muted-foreground">{tCommon("loading")}</p>
+      </div>
+    );
+  }
+
   if (!hasViewPermission) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4">

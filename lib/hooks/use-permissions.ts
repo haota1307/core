@@ -84,31 +84,46 @@ export function usePermissions(): UserPermissions {
 /**
  * Hook để check một permission cụ thể
  */
-export function useHasPermission(permission: string): boolean {
+export function useHasPermission(permission: string): {
+  hasPermission: boolean;
+  loading: boolean;
+} {
   const { permissions, loading } = usePermissions();
 
-  if (loading) return false;
-  return permissions.includes(permission);
+  return {
+    hasPermission: permissions.includes(permission),
+    loading,
+  };
 }
 
 /**
  * Hook để check một trong nhiều permissions (OR logic)
  */
-export function useHasAnyPermission(requiredPermissions: string[]): boolean {
+export function useHasAnyPermission(requiredPermissions: string[]): {
+  hasPermission: boolean;
+  loading: boolean;
+} {
   const { permissions, loading } = usePermissions();
 
-  if (loading) return false;
-  return requiredPermissions.some((p) => permissions.includes(p));
+  return {
+    hasPermission: requiredPermissions.some((p) => permissions.includes(p)),
+    loading,
+  };
 }
 
 /**
  * Hook để check tất cả permissions (AND logic)
  */
-export function useHasAllPermissions(requiredPermissions: string[]): boolean {
+export function useHasAllPermissions(requiredPermissions: string[]): {
+  hasPermission: boolean;
+  loading: boolean;
+} {
   const { permissions, loading } = usePermissions();
 
-  if (loading) return false;
-  return requiredPermissions.every((p) => permissions.includes(p));
+  return {
+    hasPermission: requiredPermissions.every((p) => permissions.includes(p)),
+    loading,
+  };
 }
 
 /**

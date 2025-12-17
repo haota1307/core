@@ -18,7 +18,10 @@
     "error": "Lỗi",
     "success": "Thành công",
     "accessDenied": "Truy cập bị từ chối",
-    "noPermission": "Bạn không có quyền truy cập trang này"
+    "noPermission": "Bạn không có quyền truy cập trang này",
+    "createSubfolder": "Tạo thư mục con",
+    "files": "tệp",
+    "subFolders": "thư mục con"
   },
   "auth": {
     "loginTitle": "Đăng nhập vào tài khoản",
@@ -325,6 +328,122 @@
       "createError": "Tạo quyền thất bại",
       "updateError": "Cập nhật quyền thất bại",
       "deleteError": "Xóa quyền thất bại"
+    }
+  },
+  "media": {
+    "title": "Thư viện Media",
+    "description": "Quản lý các tệp media trong hệ thống",
+    "addNew": "Tải lên Media",
+    "newFolder": "Thư mục mới",
+    "searchPlaceholder": "Tìm kiếm media...",
+    "noResults": "Không tìm thấy media",
+    "columnsToggle": "Cột",
+    "toggleColumns": "Hiển thị cột",
+    "folder": {
+      "title": "Thư mục",
+      "root": "Tất cả Media",
+      "createTitle": "Tạo thư mục mới",
+      "createDescription": "Tạo thư mục mới để tổ chức media của bạn",
+      "editTitle": "Đổi tên thư mục",
+      "editDescription": "Thay đổi tên thư mục",
+      "nameLabel": "Tên thư mục",
+      "namePlaceholder": "Nhập tên thư mục",
+      "create": "Tạo",
+      "update": "Cập nhật",
+      "cancel": "Hủy",
+      "saving": "Đang lưu...",
+      "deleteTitle": "Xóa thư mục?",
+      "deleteDescription": "Hành động này sẽ xóa thư mục và chuyển tất cả media bên trong về thư mục gốc. Không thể hoàn tác.",
+      "delete": "Xóa",
+      "deleting": "Đang xóa...",
+      "createSuccess": "Tạo thư mục thành công",
+      "updateSuccess": "Cập nhật thư mục thành công",
+      "deleteSuccess": "Xóa thư mục thành công",
+      "createError": "Tạo thư mục thất bại",
+      "updateError": "Cập nhật thư mục thất bại",
+      "deleteError": "Xóa thư mục thất bại"
+    },
+    "upload": {
+      "title": "Tải lên Media",
+      "description": "Tải lên hình ảnh, video và các tệp khác",
+      "dropzone": "Kéo thả tệp vào đây, hoặc nhấp để chọn",
+      "fileLabel": "Tệp",
+      "altLabel": "Văn bản thay thế",
+      "altPlaceholder": "Nhập văn bản thay thế cho khả năng tiếp cận",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Nhập tiêu đề media",
+      "descriptionLabel": "Mô tả",
+      "descriptionPlaceholder": "Nhập mô tả media",
+      "uploadButton": "Tải lên",
+      "uploading": "Đang tải lên...",
+      "cancel": "Hủy"
+    },
+    "edit": {
+      "title": "Chỉnh sửa Media",
+      "description": "Cập nhật thông tin media",
+      "altLabel": "Văn bản thay thế",
+      "altPlaceholder": "Nhập văn bản thay thế",
+      "titleLabel": "Tiêu đề",
+      "titlePlaceholder": "Nhập tiêu đề",
+      "descriptionLabel": "Mô tả",
+      "descriptionPlaceholder": "Nhập mô tả",
+      "updateButton": "Cập nhật",
+      "cancel": "Hủy"
+    },
+    "delete": {
+      "title": "Xóa Media?",
+      "description": "Hành động này sẽ xóa vĩnh viễn tệp media. Không thể hoàn tác.",
+      "inUseWarning": "Media này đang được sử dụng ở {count} nơi. Vui lòng xóa khỏi các vị trí đó trước.",
+      "cancel": "Hủy",
+      "delete": "Xóa",
+      "deleting": "Đang xóa..."
+    },
+    "detail": {
+      "title": "Chi tiết Media",
+      "filename": "Tên tệp",
+      "fileSize": "Kích thước",
+      "dimensions": "Kích thước ảnh",
+      "mimeType": "Loại",
+      "uploadedBy": "Tải lên bởi",
+      "uploadedAt": "Tải lên lúc",
+      "url": "URL",
+      "copyUrl": "Sao chép URL",
+      "usedIn": "Được sử dụng trong",
+      "noUsage": "Chưa được sử dụng",
+      "close": "Đóng"
+    },
+    "filters": {
+      "all": "Tất cả Media",
+      "images": "Hình ảnh",
+      "videos": "Video",
+      "documents": "Tài liệu",
+      "other": "Khác"
+    },
+    "columns": {
+      "preview": "Xem trước",
+      "name": "Tên",
+      "type": "Loại",
+      "size": "Kích thước",
+      "uploadedBy": "Tải lên bởi",
+      "uploadedAt": "Tải lên lúc",
+      "actions": "Thao tác"
+    },
+    "actions": {
+      "view": "Xem chi tiết",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "copyUrl": "Sao chép URL",
+      "download": "Tải xuống"
+    },
+    "messages": {
+      "uploadSuccess": "Tải lên media thành công",
+      "updateSuccess": "Cập nhật media thành công",
+      "deleteSuccess": "Xóa media thành công",
+      "uploadError": "Tải lên media thất bại",
+      "updateError": "Cập nhật media thất bại",
+      "deleteError": "Xóa media thất bại",
+      "deleteErrorInUse": "Không thể xóa media đang được sử dụng",
+      "urlCopied": "Đã sao chép URL vào clipboard"
     }
   }
 }

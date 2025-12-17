@@ -18,7 +18,10 @@
     "error": "Error",
     "success": "Success",
     "accessDenied": "Access Denied",
-    "noPermission": "You do not have permission to access this page"
+    "noPermission": "You do not have permission to access this page",
+    "createSubfolder": "Create Subfolder",
+    "files": "files",
+    "subFolders": "subfolders"
   },
   "auth": {
     "loginTitle": "Login to your account",
@@ -325,6 +328,122 @@
       "createError": "Failed to create permission",
       "updateError": "Failed to update permission",
       "deleteError": "Failed to delete permission"
+    }
+  },
+  "media": {
+    "title": "Media Library",
+    "description": "Manage media files in the system",
+    "addNew": "Upload Media",
+    "newFolder": "New Folder",
+    "searchPlaceholder": "Search media...",
+    "noResults": "No media found",
+    "columnsToggle": "Columns",
+    "toggleColumns": "Toggle columns",
+    "folder": {
+      "title": "Folders",
+      "root": "All Media",
+      "createTitle": "Create New Folder",
+      "createDescription": "Create a new folder to organize your media",
+      "editTitle": "Rename Folder",
+      "editDescription": "Change the folder name",
+      "nameLabel": "Folder Name",
+      "namePlaceholder": "Enter folder name",
+      "create": "Create",
+      "update": "Update",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "deleteTitle": "Delete Folder?",
+      "deleteDescription": "This will delete the folder and move all media inside to root. This action cannot be undone.",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "createSuccess": "Folder created successfully",
+      "updateSuccess": "Folder updated successfully",
+      "deleteSuccess": "Folder deleted successfully",
+      "createError": "Failed to create folder",
+      "updateError": "Failed to update folder",
+      "deleteError": "Failed to delete folder"
+    },
+    "upload": {
+      "title": "Upload Media",
+      "description": "Upload images, videos, and other files",
+      "dropzone": "Drag and drop files here, or click to select",
+      "fileLabel": "File",
+      "altLabel": "Alt Text",
+      "altPlaceholder": "Enter alt text for accessibility",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter media title",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter media description",
+      "uploadButton": "Upload",
+      "uploading": "Uploading...",
+      "cancel": "Cancel"
+    },
+    "edit": {
+      "title": "Edit Media",
+      "description": "Update media information",
+      "altLabel": "Alt Text",
+      "altPlaceholder": "Enter alt text",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter title",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter description",
+      "updateButton": "Update",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "title": "Delete Media?",
+      "description": "This will permanently delete this media file. This action cannot be undone.",
+      "inUseWarning": "This media is currently being used in {count} place(s). Please remove it from those locations first.",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting..."
+    },
+    "detail": {
+      "title": "Media Details",
+      "filename": "Filename",
+      "fileSize": "File Size",
+      "dimensions": "Dimensions",
+      "mimeType": "Type",
+      "uploadedBy": "Uploaded By",
+      "uploadedAt": "Uploaded At",
+      "url": "URL",
+      "copyUrl": "Copy URL",
+      "usedIn": "Used In",
+      "noUsage": "Not used anywhere",
+      "close": "Close"
+    },
+    "filters": {
+      "all": "All Media",
+      "images": "Images",
+      "videos": "Videos",
+      "documents": "Documents",
+      "other": "Other"
+    },
+    "columns": {
+      "preview": "Preview",
+      "name": "Name",
+      "type": "Type",
+      "size": "Size",
+      "uploadedBy": "Uploaded By",
+      "uploadedAt": "Uploaded At",
+      "actions": "Actions"
+    },
+    "actions": {
+      "view": "View Details",
+      "edit": "Edit",
+      "delete": "Delete",
+      "copyUrl": "Copy URL",
+      "download": "Download"
+    },
+    "messages": {
+      "uploadSuccess": "Media uploaded successfully",
+      "updateSuccess": "Media updated successfully",
+      "deleteSuccess": "Media deleted successfully",
+      "uploadError": "Failed to upload media",
+      "updateError": "Failed to update media",
+      "deleteError": "Failed to delete media",
+      "deleteErrorInUse": "Cannot delete media that is currently in use",
+      "urlCopied": "URL copied to clipboard"
     }
   }
 }

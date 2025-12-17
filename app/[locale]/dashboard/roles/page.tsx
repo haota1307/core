@@ -18,7 +18,8 @@ import type { SortingState } from "@tanstack/react-table";
 const RolesPage = () => {
   const t = useTranslations("roles");
   const tCommon = useTranslations("common");
-  const hasViewPermission = useHasPermission("roles.view");
+  const { hasPermission: hasViewPermission, loading: permissionsLoading } =
+    useHasPermission("roles.view");
 
   // State for pagination, search, and filters
   const [page, setPage] = useState(1);
@@ -31,7 +32,9 @@ const RolesPage = () => {
     updaterOrValue: SortingState | ((old: SortingState) => SortingState)
   ) => {
     const newSorting =
-      typeof updaterOrValue === "function" ? updaterOrValue(sorting) : updaterOrValue;
+      typeof updaterOrValue === "function"
+        ? updaterOrValue(sorting)
+        : updaterOrValue;
     setSorting(newSorting);
   };
 
@@ -39,8 +42,9 @@ const RolesPage = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingRole, setEditingRole] = useState<RoleResponse | undefined>();
   const [deletingRole, setDeletingRole] = useState<RoleResponse | undefined>();
-  const [managingPermissionsRoleId, setManagingPermissionsRoleId] =
-    useState<string | undefined>();
+  const [managingPermissionsRoleId, setManagingPermissionsRoleId] = useState<
+    string | undefined
+  >();
 
   // Build query params
   const sortBy = sorting[0]?.id;
@@ -80,6 +84,15 @@ const RolesPage = () => {
   });
 
   // Check permission
+  if (permissionsLoading) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        <p className="text-sm text-muted-foreground">{tCommon("loading")}</p>
+      </div>
+    );
+  }
+
   if (!hasViewPermission) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4">

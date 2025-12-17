@@ -18,6 +18,11 @@ const PERMISSIONS = [
   { code: "permissions.manage", desc: "Quản lý quyền" },
   { code: "dashboard.view", desc: "Truy cập dashboard" },
   { code: "dashboard.analytics", desc: "Xem analytics" },
+  { code: "media.view", desc: "Xem thư viện media" },
+  { code: "media.upload", desc: "Upload media" },
+  { code: "media.edit", desc: "Chỉnh sửa media" },
+  { code: "media.delete", desc: "Xóa media" },
+  { code: "media.manage", desc: "Quản lý toàn bộ media" },
 ];
 
 // Roles với permissions
@@ -46,13 +51,18 @@ const ROLES = [
       "permissions.manage",
       "dashboard.view",
       "dashboard.analytics",
+      "media.view",
+      "media.upload",
+      "media.edit",
+      "media.delete",
+      "media.manage",
     ],
   },
   {
     name: "User",
     desc: "Người dùng thông thường",
     isSystem: true,
-    perms: ["dashboard.view"],
+    perms: ["dashboard.view", "media.view", "media.upload"],
   },
 ];
 

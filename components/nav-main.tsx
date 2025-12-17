@@ -32,6 +32,7 @@ export function NavMain({
     items?: {
       title: string;
       url: string;
+      permission?: string;
     }[];
   }[];
 }) {
