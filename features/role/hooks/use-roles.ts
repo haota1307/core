@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   getRolesAction,
   getRoleAction,
@@ -81,6 +82,7 @@ export function useRole(id: string) {
  */
 export function useCreateRole() {
   const queryClient = useQueryClient();
+  const t = useTranslations("roles.messages");
 
   return useMutation({
     mutationFn: async (input: CreateRoleInput) => {
@@ -92,10 +94,10 @@ export function useCreateRole() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: roleKeys.all });
-      toast.success(data.message || "Role created successfully");
+      toast.success(t("createSuccess"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to create role");
+      toast.error(t("createError"));
     },
   });
 }
@@ -105,6 +107,7 @@ export function useCreateRole() {
  */
 export function useUpdateRole(id: string) {
   const queryClient = useQueryClient();
+  const t = useTranslations("roles.messages");
 
   return useMutation({
     mutationFn: async (input: UpdateRoleInput) => {
@@ -117,10 +120,10 @@ export function useUpdateRole(id: string) {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: roleKeys.all });
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(id) });
-      toast.success(data.message || "Role updated successfully");
+      toast.success(t("updateSuccess"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update role");
+      toast.error(t("updateError"));
     },
   });
 }
@@ -130,6 +133,7 @@ export function useUpdateRole(id: string) {
  */
 export function useDeleteRole() {
   const queryClient = useQueryClient();
+  const t = useTranslations("roles.messages");
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -141,10 +145,10 @@ export function useDeleteRole() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: roleKeys.all });
-      toast.success(data.message || "Role deleted successfully");
+      toast.success(t("deleteSuccess"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to delete role");
+      toast.error(t("deleteError"));
     },
   });
 }
@@ -154,6 +158,7 @@ export function useDeleteRole() {
  */
 export function useUpdateRolePermissions(roleId: string) {
   const queryClient = useQueryClient();
+  const t = useTranslations("roles.messages");
 
   return useMutation({
     mutationFn: async (input: UpdateRolePermissionsInput) => {
@@ -166,10 +171,10 @@ export function useUpdateRolePermissions(roleId: string) {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: roleKeys.all });
       queryClient.invalidateQueries({ queryKey: roleKeys.detail(roleId) });
-      toast.success(data.message || "Role permissions updated successfully");
+      toast.success(t("permissionsUpdateSuccess"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update role permissions");
+      toast.error(t("permissionsUpdateError"));
     },
   });
 }
@@ -200,6 +205,7 @@ export function usePermissions(
  */
 export function useCreatePermission() {
   const queryClient = useQueryClient();
+  const t = useTranslations("permissions.messages");
 
   return useMutation({
     mutationFn: async (input: CreatePermissionInput) => {
@@ -211,10 +217,10 @@ export function useCreatePermission() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: roleKeys.permissions() });
-      toast.success(data.message || "Permission created successfully");
+      toast.success(t("createSuccess"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to create permission");
+      toast.error(t("createError"));
     },
   });
 }
@@ -224,6 +230,7 @@ export function useCreatePermission() {
  */
 export function useUpdatePermission(id: string) {
   const queryClient = useQueryClient();
+  const t = useTranslations("permissions.messages");
 
   return useMutation({
     mutationFn: async (input: UpdatePermissionInput) => {
@@ -235,10 +242,10 @@ export function useUpdatePermission(id: string) {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: roleKeys.permissions() });
-      toast.success(data.message || "Permission updated successfully");
+      toast.success(t("updateSuccess"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to update permission");
+      toast.error(t("updateError"));
     },
   });
 }
@@ -248,6 +255,7 @@ export function useUpdatePermission(id: string) {
  */
 export function useDeletePermission() {
   const queryClient = useQueryClient();
+  const t = useTranslations("permissions.messages");
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -259,10 +267,10 @@ export function useDeletePermission() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: roleKeys.permissions() });
-      toast.success(data.message || "Permission deleted successfully");
+      toast.success(t("deleteSuccess"));
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to delete permission");
+      toast.error(t("deleteError"));
     },
   });
 }

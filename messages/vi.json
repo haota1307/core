@@ -256,6 +256,16 @@
       "next": "Sau",
       "page": "Trang {current} / {total}",
       "selectedRows": "/ {total} hàng đã chọn"
+    },
+    "messages": {
+      "createSuccess": "Tạo vai trò thành công",
+      "updateSuccess": "Cập nhật vai trò thành công",
+      "deleteSuccess": "Xóa vai trò thành công",
+      "permissionsUpdateSuccess": "Cập nhật quyền thành công",
+      "createError": "Tạo vai trò thất bại",
+      "updateError": "Cập nhật vai trò thất bại",
+      "deleteError": "Xóa vai trò thất bại",
+      "permissionsUpdateError": "Cập nhật quyền thất bại"
     }
   },
   "permissions": {
@@ -307,6 +317,14 @@
       "next": "Sau",
       "page": "Trang {current} / {total}",
       "selectedRows": "/ {total} hàng đã chọn"
+    },
+    "messages": {
+      "createSuccess": "Tạo quyền thành công",
+      "updateSuccess": "Cập nhật quyền thành công",
+      "deleteSuccess": "Xóa quyền thành công",
+      "createError": "Tạo quyền thất bại",
+      "updateError": "Cập nhật quyền thất bại",
+      "deleteError": "Xóa quyền thất bại"
     }
   }
 }

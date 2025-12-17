@@ -256,6 +256,16 @@
       "next": "Next",
       "page": "Page {current} / {total}",
       "selectedRows": "/ {total} row(s) selected"
+    },
+    "messages": {
+      "createSuccess": "Role created successfully",
+      "updateSuccess": "Role updated successfully",
+      "deleteSuccess": "Role deleted successfully",
+      "permissionsUpdateSuccess": "Role permissions updated successfully",
+      "createError": "Failed to create role",
+      "updateError": "Failed to update role",
+      "deleteError": "Failed to delete role",
+      "permissionsUpdateError": "Failed to update permissions"
     }
   },
   "permissions": {
@@ -307,6 +317,14 @@
       "next": "Next",
       "page": "Page {current} / {total}",
       "selectedRows": "/ {total} row(s) selected"
+    },
+    "messages": {
+      "createSuccess": "Permission created successfully",
+      "updateSuccess": "Permission updated successfully",
+      "deleteSuccess": "Permission deleted successfully",
+      "createError": "Failed to create permission",
+      "updateError": "Failed to update permission",
+      "deleteError": "Failed to delete permission"
     }
   }
 }

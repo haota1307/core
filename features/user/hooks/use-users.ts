@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import {
   getUsersAction,
   getUserAction,
@@ -65,6 +66,7 @@ export function useUser(id: string) {
  */
 export function useCreateUser() {
   const queryClient = useQueryClient();
+  const t = useTranslations("users.messages");
 
   return useMutation({
     mutationFn: async (input: CreateUserInput) => {
@@ -77,10 +79,10 @@ export function useCreateUser() {
     onSuccess: (data) => {
       // Invalidate users list
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      toast.success(data.message || "User created successfully");
+      toast.success(t("createSuccess"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to create user");
+      toast.error(t("createError"));
     },
   });
 }
@@ -90,6 +92,7 @@ export function useCreateUser() {
  */
 export function useUpdateUser(id: string) {
   const queryClient = useQueryClient();
+  const t = useTranslations("users.messages");
 
   return useMutation({
     mutationFn: async (input: UpdateUserInput) => {
@@ -103,10 +106,10 @@ export function useUpdateUser(id: string) {
       // Invalidate users list and detail
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
       queryClient.invalidateQueries({ queryKey: userKeys.detail(id) });
-      toast.success(data.message || "User updated successfully");
+      toast.success(t("updateSuccess"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update user");
+      toast.error(t("updateError"));
     },
   });
 }
@@ -116,6 +119,7 @@ export function useUpdateUser(id: string) {
  */
 export function useDeleteUser() {
   const queryClient = useQueryClient();
+  const t = useTranslations("users.messages");
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -128,10 +132,10 @@ export function useDeleteUser() {
     onSuccess: (data) => {
       // Invalidate users list
       queryClient.invalidateQueries({ queryKey: userKeys.lists() });
-      toast.success(data.message || "User deleted successfully");
+      toast.success(t("deleteSuccess"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete user");
+      toast.error(t("deleteError"));
     },
   });
 }
