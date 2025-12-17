@@ -131,10 +131,26 @@ export const createHttpClient = (config: HttpClientConfig) => {
     const resolvedHeaders = new Headers(headers);
 
     if (auth) {
-      const token = await config.getAccessToken?.();
-      if (token) {
-        resolvedHeaders.set("Authorization", `Bearer ${token}`);
+      // Only try to get token on client-side
+      if (typeof window !== "undefined") {
+        const token = config.getAccessToken?.();
+        if (token) {
+          resolvedHeaders.set("Authorization", `Bearer ${token}`);
+          console.log(
+            `[HTTP Client] Token found and added to request: ${path.substring(
+              0,
+              20
+            )}...`
+          );
+        } else {
+          console.warn(
+            `[HTTP Client] No access token found for request to: ${path}. Cookies: ${
+              document.cookie ? "present" : "missing"
+            }`
+          );
+        }
       }
+      // Server-side: skip auth header (will fail with 401, which is expected)
     }
 
     let preparedBody: BodyInit | undefined;

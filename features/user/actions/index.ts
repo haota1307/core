@@ -124,10 +124,11 @@ export async function deleteUserAction(id: string) {
 
 /**
  * Lấy danh sách roles (cho dropdown)
+ * Sử dụng endpoint /api/roles/list không yêu cầu permission
  */
 export async function getRolesAction() {
   try {
-    const response = await http.get<{ data: RoleResponse[] }>("/api/roles");
+    const response = await http.get<{ data: RoleResponse[] }>("/api/roles/list");
     return { success: true, data: response.data };
   } catch (error: any) {
     console.error("Get roles error:", error);

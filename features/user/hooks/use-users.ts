@@ -10,11 +10,7 @@ import {
   deleteUserAction,
   getRolesAction,
 } from "../actions";
-import {
-  CreateUserInput,
-  UpdateUserInput,
-  GetUsersQuery,
-} from "../schemas";
+import { CreateUserInput, UpdateUserInput, GetUsersQuery } from "../schemas";
 
 // Query keys
 export const userKeys = {
@@ -29,7 +25,10 @@ export const userKeys = {
 /**
  * Hook lấy danh sách users với phân trang
  */
-export function useUsers(query: GetUsersQuery) {
+export function useUsers(
+  query: GetUsersQuery,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: userKeys.list(query),
     queryFn: async () => {
@@ -40,6 +39,7 @@ export function useUsers(query: GetUsersQuery) {
       return result.data;
     },
     staleTime: 5 * 1000, // 5 seconds - refetch on filter/sort changes
+    enabled: options?.enabled ?? true, // Default true để không break existing code
   });
 }
 
@@ -152,4 +152,3 @@ export function useRoles() {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
-

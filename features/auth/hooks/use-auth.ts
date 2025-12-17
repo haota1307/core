@@ -7,6 +7,8 @@ import { loginAction, registerAction, logoutAction } from "../actions";
 import type { LoginInput, RegisterInput } from "../schemas";
 import { toast } from "sonner";
 import { storeTokens, clearTokens } from "@/lib/cookies";
+import { clearPermissionsCache } from "@/lib/hooks/use-permissions";
+import { http } from "@/lib/http";
 
 export const useLogin = () => {
   const router = useRouter();
@@ -20,9 +22,11 @@ export const useLogin = () => {
       }
       return result.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Store tokens in both localStorage and cookies
       storeTokens(data.accessToken, data.refreshToken);
+
+      // Navigate first, permissions will be fetched by usePermissions hook
       router.replace("/dashboard");
     },
     onError: (error: any) => {
@@ -51,9 +55,11 @@ export const useRegister = () => {
       }
       return result.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Store tokens in both localStorage and cookies
       storeTokens(data.accessToken, data.refreshToken);
+
+      // Navigate first, permissions will be fetched by usePermissions hook
       router.replace("/dashboard");
     },
     onError: (error: any) => {
@@ -84,6 +90,8 @@ export const useLogout = () => {
     onSuccess: () => {
       // Clear tokens from both localStorage and cookies
       clearTokens();
+      // Clear permissions cache
+      clearPermissionsCache();
       router.push("/auth/login");
     },
     onError: (error: any) => {

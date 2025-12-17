@@ -16,7 +16,9 @@
     "search": "Tìm kiếm",
     "loading": "Đang tải...",
     "error": "Lỗi",
-    "success": "Thành công"
+    "success": "Thành công",
+    "accessDenied": "Truy cập bị từ chối",
+    "noPermission": "Bạn không có quyền truy cập trang này"
   },
   "auth": {
     "loginTitle": "Đăng nhập vào tài khoản",
@@ -187,6 +189,124 @@
       "createError": "Tạo người dùng thất bại",
       "updateError": "Cập nhật người dùng thất bại",
       "deleteError": "Xóa người dùng thất bại"
+    }
+  },
+  "roles": {
+    "title": "Vai trò",
+    "description": "Quản lý vai trò và phân quyền trong hệ thống",
+    "addNew": "Thêm vai trò mới",
+    "searchPlaceholder": "Tìm kiếm vai trò...",
+    "noResults": "Không tìm thấy vai trò",
+    "columnsToggle": "Cột",
+    "toggleColumns": "Hiển thị cột",
+    "dialog": {
+      "createTitle": "Tạo vai trò mới",
+      "createDescription": "Thêm vai trò mới vào hệ thống",
+      "editTitle": "Chỉnh sửa vai trò",
+      "editDescription": "Cập nhật thông tin vai trò",
+      "cancel": "Hủy"
+    },
+    "delete": {
+      "title": "Bạn có chắc chắn?",
+      "description": "Hành động này sẽ xóa vai trò {roleName}. Không thể hoàn tác.",
+      "cancel": "Hủy",
+      "delete": "Xóa",
+      "deleting": "Đang xóa..."
+    },
+    "permissions": {
+      "title": "Quản lý quyền hạn - {roleName}",
+      "description": "Chọn các quyền hạn cho vai trò này",
+      "selectAll": "Chọn tất cả",
+      "deselectAll": "Bỏ chọn tất cả",
+      "selectedCount": "Đã chọn {count} quyền",
+      "cancel": "Hủy",
+      "save": "Lưu",
+      "saving": "Đang lưu..."
+    },
+    "form": {
+      "name": "Tên vai trò",
+      "namePlaceholder": "Nhập tên vai trò",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Nhập mô tả vai trò",
+      "create": "Tạo",
+      "update": "Cập nhật",
+      "cancel": "Hủy",
+      "saving": "Đang lưu..."
+    },
+    "columns": {
+      "name": "Tên",
+      "description": "Mô tả",
+      "system": "Hệ thống",
+      "actions": "Thao tác",
+      "openMenu": "Mở menu",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa",
+      "managePermissions": "Quản lý quyền hạn"
+    },
+    "filters": {
+      "isSystem": "Vai trò hệ thống",
+      "systemRole": "Vai trò hệ thống",
+      "customRole": "Vai trò tùy chỉnh"
+    },
+    "actions": {
+      "reset": "Đặt lại"
+    },
+    "pagination": {
+      "previous": "Trước",
+      "next": "Sau",
+      "page": "Trang {current} / {total}",
+      "selectedRows": "/ {total} hàng đã chọn"
+    }
+  },
+  "permissions": {
+    "title": "Quyền hạn",
+    "description": "Quản lý các quyền hạn trong hệ thống",
+    "addNew": "Thêm quyền hạn mới",
+    "searchPlaceholder": "Tìm kiếm quyền hạn...",
+    "noResults": "Không tìm thấy quyền hạn",
+    "columnsToggle": "Cột",
+    "toggleColumns": "Hiển thị cột",
+    "dialog": {
+      "createTitle": "Tạo quyền hạn mới",
+      "createDescription": "Thêm quyền hạn mới vào hệ thống",
+      "editTitle": "Chỉnh sửa quyền hạn",
+      "editDescription": "Cập nhật thông tin quyền hạn",
+      "cancel": "Hủy"
+    },
+    "delete": {
+      "title": "Bạn có chắc chắn?",
+      "description": "Hành động này sẽ xóa quyền hạn {permissionCode}. Không thể hoàn tác.",
+      "cancel": "Hủy",
+      "delete": "Xóa",
+      "deleting": "Đang xóa..."
+    },
+    "form": {
+      "code": "Mã quyền",
+      "codePlaceholder": "users.view",
+      "codeCannotChange": "Mã quyền không thể thay đổi sau khi tạo",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Nhập mô tả quyền hạn",
+      "create": "Tạo",
+      "update": "Cập nhật",
+      "cancel": "Hủy",
+      "saving": "Đang lưu..."
+    },
+    "columns": {
+      "code": "Mã",
+      "description": "Mô tả",
+      "actions": "Thao tác",
+      "openMenu": "Mở menu",
+      "edit": "Chỉnh sửa",
+      "delete": "Xóa"
+    },
+    "actions": {
+      "reset": "Đặt lại"
+    },
+    "pagination": {
+      "previous": "Trước",
+      "next": "Sau",
+      "page": "Trang {current} / {total}",
+      "selectedRows": "/ {total} hàng đã chọn"
     }
   }
 }
