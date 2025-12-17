@@ -17,9 +17,11 @@ export type NavigationItem = {
   url: string;
   icon?: LucideIcon;
   isActive?: boolean;
+  permission?: string; // Required permission to show this item
   items?: {
     title: string;
     url: string;
+    permission?: string; // Required permission to show this item
   }[];
 };
 
@@ -67,11 +69,13 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
         },
         {
           title: tNavItems("roles"),
-          url: "/dashboard/users/roles",
+          url: "/dashboard/roles",
+          permission: "roles.view",
         },
         {
           title: tNavItems("permissions"),
-          url: "/dashboard/users/permissions",
+          url: "/dashboard/permissions",
+          permission: "permissions.view",
         },
       ],
     },

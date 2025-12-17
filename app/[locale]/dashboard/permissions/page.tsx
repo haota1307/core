@@ -3,26 +3,25 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { UserDataTable } from "@/features/user/components/user-table/user-data-table";
-import { createColumns } from "@/features/user/components/user-table/columns";
-import { UserDialog } from "@/features/user/components/user-dialog";
-import { UserDeleteDialog } from "@/features/user/components/user-delete-dialog";
-import { useUsers } from "@/features/user/hooks/use-users";
-import { UserResponse } from "@/features/user/schemas";
+import { PermissionDataTable } from "@/features/role/components/permission-table/permission-data-table";
+import { createPermissionColumns } from "@/features/role/components/permission-table/columns";
+import { PermissionDialog } from "@/features/role/components/permission-dialog";
+import { PermissionDeleteDialog } from "@/features/role/components/permission-delete-dialog";
+import { usePermissions } from "@/features/role/hooks/use-roles";
+import { PermissionResponse } from "@/features/role/schemas";
 import { useTranslations } from "next-intl";
+import { PermissionGuard } from "@/components/permission-guard";
 import { useHasPermission } from "@/lib/hooks/use-permissions";
 import type { SortingState } from "@tanstack/react-table";
 
-const UsersPage = () => {
-  const hasViewPermission = useHasPermission("users.view");
+const PermissionsPage = () => {
+  const t = useTranslations("permissions");
   const tCommon = useTranslations("common");
-  const t = useTranslations("users");
+  const hasViewPermission = useHasPermission("permissions.view");
 
   // State for pagination, search, and filters
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string[]>([]);
-  const [roleFilter, setRoleFilter] = useState<string[]>([]);
   const [sorting, setSorting] = useState<SortingState>([]);
 
   // Handle sorting changes
@@ -30,52 +29,39 @@ const UsersPage = () => {
     updaterOrValue: SortingState | ((old: SortingState) => SortingState)
   ) => {
     const newSorting =
-      typeof updaterOrValue === "function"
-        ? updaterOrValue(sorting)
-        : updaterOrValue;
+      typeof updaterOrValue === "function" ? updaterOrValue(sorting) : updaterOrValue;
     setSorting(newSorting);
   };
 
   // State for dialogs
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<UserResponse | undefined>();
-  const [deletingUser, setDeletingUser] = useState<UserResponse | undefined>();
+  const [editingPermission, setEditingPermission] =
+    useState<PermissionResponse | undefined>();
+  const [deletingPermission, setDeletingPermission] =
+    useState<PermissionResponse | undefined>();
 
   // Build query params
   const sortBy = sorting[0]?.id;
   const sortOrder = sorting[0]?.desc ? "desc" : "asc";
 
-  // Fetch users with React Query - chỉ khi có permission
-  const { data, isLoading } = useUsers(
+  // Fetch permissions with React Query - chỉ khi có permission
+  const { data, isLoading, error } = usePermissions(
     {
       page,
       limit: 10,
       search,
-      // Send all selected filters (support multiple values)
-      status:
-        statusFilter.length > 0
-          ? ((statusFilter.length === 1
-              ? statusFilter[0]
-              : statusFilter) as any)
-          : undefined,
-      roleId:
-        roleFilter.length > 0
-          ? roleFilter.length === 1
-            ? roleFilter[0]
-            : roleFilter
-          : undefined,
       sortBy,
       sortOrder,
     },
     {
-      enabled: hasViewPermission, // Chỉ fetch khi có permission
+      enabled: hasViewPermission,
     }
   );
 
   // Columns with actions and i18n
-  const columns = createColumns({
-    onEdit: (user) => setEditingUser(user),
-    onDelete: (user) => setDeletingUser(user),
+  const columns = createPermissionColumns({
+    onEdit: (permission) => setEditingPermission(permission),
+    onDelete: (permission) => setDeletingPermission(permission),
     t,
   });
 
@@ -103,14 +89,25 @@ const UsersPage = () => {
             {t("description")}
           </p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t("addNew")}
-        </Button>
+        <PermissionGuard permission="permissions.manage">
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t("addNew")}
+          </Button>
+        </PermissionGuard>
       </div>
 
-      {/* Data Table - No Card wrapper */}
-      <UserDataTable
+      {/* Error message */}
+      {error && (
+        <div className="rounded-md bg-destructive/15 p-4 text-sm text-destructive">
+          {error instanceof Error
+            ? error.message
+            : "Failed to load permissions"}
+        </div>
+      )}
+
+      {/* Data Table */}
+      <PermissionDataTable
         columns={columns}
         data={data?.data || []}
         isLoading={isLoading}
@@ -119,38 +116,33 @@ const UsersPage = () => {
         onPageChange={setPage}
         searchValue={search}
         onSearchChange={setSearch}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        roleFilter={roleFilter}
-        onRoleFilterChange={setRoleFilter}
         sorting={sorting}
         onSortingChange={handleSortingChange}
       />
 
       {/* Create/Edit Dialog */}
-      <UserDialog
-        open={isCreateDialogOpen || !!editingUser}
+      <PermissionDialog
+        open={isCreateDialogOpen || !!editingPermission}
         onOpenChange={(open) => {
           if (!open) {
             setIsCreateDialogOpen(false);
-            setEditingUser(undefined);
+            setEditingPermission(undefined);
           }
         }}
-        user={editingUser}
+        permission={editingPermission}
       />
 
-      {/* Delete Dialog */}
-      {deletingUser && (
-        <UserDeleteDialog
-          open={!!deletingUser}
+      {deletingPermission && (
+        <PermissionDeleteDialog
+          open={!!deletingPermission}
           onOpenChange={(open) => {
-            if (!open) setDeletingUser(undefined);
+            if (!open) setDeletingPermission(undefined);
           }}
-          user={deletingUser}
+          permission={deletingPermission}
         />
       )}
     </div>
   );
 };
 
-export default UsersPage;
+export default PermissionsPage;

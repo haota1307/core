@@ -56,7 +56,7 @@ export const GET = withPermission(
       // Filter by status(es) - support multiple statuses
       if (statuses.length > 0) {
         const statusConditions: any[] = [];
-        
+
         statuses.forEach((status) => {
           if (status === "active") {
             statusConditions.push({ emailVerified: { not: null } });
@@ -78,9 +78,10 @@ export const GET = withPermission(
       }
 
       // Combine all conditions with AND
-      const where = whereConditions.length === 1 
-        ? whereConditions[0]
-        : { AND: whereConditions };
+      const where =
+        whereConditions.length === 1
+          ? whereConditions[0]
+          : { AND: whereConditions };
 
       // Build orderBy
       const orderBy: any = {};
@@ -155,7 +156,10 @@ export const POST = withPermission(
       // Validation
       if (!email || !password) {
         return NextResponse.json(
-          { code: "MISSING_FIELDS", message: "Email and password are required" },
+          {
+            code: "MISSING_FIELDS",
+            message: "Email and password are required",
+          },
           { status: 400 }
         );
       }
@@ -202,10 +206,7 @@ export const POST = withPermission(
         },
       });
 
-      return NextResponse.json(
-        { data: user, message: "User created successfully" },
-        { status: 201 }
-      );
+      return NextResponse.json({ data: user }, { status: 201 });
     } catch (error) {
       console.error("Create user error:", error);
       return NextResponse.json(
@@ -215,4 +216,3 @@ export const POST = withPermission(
     }
   }
 );
-

@@ -145,7 +145,6 @@ export const PATCH = withPermission(
 
       return NextResponse.json({
         data: user,
-        message: "User updated successfully",
       });
     } catch (error) {
       console.error("Update user error:", error);
@@ -192,7 +191,7 @@ export const DELETE = withPermission(
       });
 
       return NextResponse.json({
-        message: "User deleted successfully",
+        success: true,
       });
     } catch (error) {
       console.error("Delete user error:", error);

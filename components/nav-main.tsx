@@ -4,6 +4,7 @@ import { ChevronRight, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { LocaleLink } from "@/components/locale-link";
+import { PermissionGuard } from "@/components/permission-guard";
 import {
   Collapsible,
   CollapsibleContent,
@@ -55,16 +56,21 @@ export function NavMain({
                   <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 </SidebarMenuButton>
               </CollapsibleTrigger>
-              <CollapsibleContent>
+                <CollapsibleContent>
                 <SidebarMenuSub>
                   {item.items?.map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.title}>
-                      <SidebarMenuSubButton asChild>
-                        <LocaleLink href={subItem.url}>
-                          <span>{subItem.title}</span>
-                        </LocaleLink>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
+                    <PermissionGuard
+                      key={subItem.title}
+                      permission={subItem.permission}
+                    >
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton asChild>
+                          <LocaleLink href={subItem.url}>
+                            <span>{subItem.title}</span>
+                          </LocaleLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </PermissionGuard>
                   ))}
                 </SidebarMenuSub>
               </CollapsibleContent>

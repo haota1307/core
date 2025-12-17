@@ -1,28 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { withPermission } from "@/lib/rbac";
-import { createRoleSchema, getRolesQuerySchema } from "@/features/role/schemas";
+import {
+  createPermissionSchema,
+  getPermissionsQuerySchema,
+} from "@/features/role/schemas";
 
 /**
- * GET /api/roles
- * Lấy danh sách roles với phân trang, search, filter
+ * GET /api/permissions
+ * Lấy danh sách permissions với phân trang, search
  */
 export const GET = withPermission(
-  "roles.view",
+  "permissions.view",
   async (request: NextRequest) => {
     try {
       const searchParams = request.nextUrl.searchParams;
 
       // Parse và validate query params
       // Convert null to undefined for optional fields
-      const query = getRolesQuerySchema.parse({
+      const query = getPermissionsQuerySchema.parse({
         page: searchParams.get("page") || undefined,
         limit: searchParams.get("limit") || undefined,
         search: searchParams.get("search") || undefined,
-        isSystem:
-          searchParams.getAll("isSystem").length > 0
-            ? searchParams.getAll("isSystem").map((v) => v === "true")
-            : undefined,
         sortBy: searchParams.get("sortBy") || undefined,
         sortOrder: searchParams.get("sortOrder") || undefined,
       });
@@ -36,28 +35,14 @@ export const GET = withPermission(
         { deletedAt: null }, // Always include soft delete filter
       ];
 
-      // Search condition: (name contains OR description contains)
+      // Search condition: (code contains OR description contains)
       if (query.search) {
         whereConditions.push({
           OR: [
-            { name: { contains: query.search, mode: "insensitive" } },
+            { code: { contains: query.search, mode: "insensitive" } },
             { description: { contains: query.search, mode: "insensitive" } },
           ],
         });
-      }
-
-      // Filter by isSystem
-      if (query.isSystem !== undefined) {
-        const isSystemValues = Array.isArray(query.isSystem)
-          ? query.isSystem
-          : [query.isSystem];
-        if (isSystemValues.length > 0) {
-          if (isSystemValues.length === 1) {
-            whereConditions.push({ isSystem: isSystemValues[0] });
-          } else {
-            whereConditions.push({ isSystem: { in: isSystemValues } });
-          }
-        }
       }
 
       // Combine all conditions with AND
@@ -69,36 +54,35 @@ export const GET = withPermission(
       // Build orderBy
       const orderBy: any = {};
       if (
-        query.sortBy === "name" ||
+        query.sortBy === "code" ||
         query.sortBy === "createdAt" ||
         query.sortBy === "updatedAt"
       ) {
         orderBy[query.sortBy] = query.sortOrder || "asc";
       } else {
-        orderBy.name = query.sortOrder || "asc";
+        orderBy.code = query.sortOrder || "asc";
       }
 
-      // Get roles with pagination
-      const [roles, total] = await Promise.all([
-        prisma.role.findMany({
+      // Get permissions with pagination
+      const [permissions, total] = await Promise.all([
+        prisma.permission.findMany({
           where,
           skip,
           take: limit,
           orderBy,
           select: {
             id: true,
-            name: true,
+            code: true,
             description: true,
-            isSystem: true,
             createdAt: true,
             updatedAt: true,
           },
         }),
-        prisma.role.count({ where }),
+        prisma.permission.count({ where }),
       ]);
 
       return NextResponse.json({
-        data: roles,
+        data: permissions,
         meta: {
           total,
           page,
@@ -107,7 +91,7 @@ export const GET = withPermission(
         },
       });
     } catch (error) {
-      console.error("Get roles error:", error);
+      console.error("Get permissions error:", error);
       return NextResponse.json(
         { code: "SERVER_ERROR", message: "Internal server error" },
         { status: 500 }
@@ -117,49 +101,50 @@ export const GET = withPermission(
 );
 
 /**
- * POST /api/roles
- * Tạo role mới
+ * POST /api/permissions
+ * Tạo permission mới
  */
 export const POST = withPermission(
-  "roles.create",
+  "permissions.manage",
   async (request: NextRequest) => {
     try {
       const body = await request.json();
-      const validatedData = createRoleSchema.parse(body);
+      const validatedData = createPermissionSchema.parse(body);
 
-      // Check if role name already exists
-      const existingRole = await prisma.role.findFirst({
+      // Check if permission code already exists
+      const existingPermission = await prisma.permission.findFirst({
         where: {
-          name: validatedData.name,
+          code: validatedData.code,
           deletedAt: null,
         },
       });
 
-      if (existingRole) {
+      if (existingPermission) {
         return NextResponse.json(
-          { code: "ROLE_EXISTS", message: "Role name already exists" },
+          {
+            code: "PERMISSION_EXISTS",
+            message: "Permission code already exists",
+          },
           { status: 409 }
         );
       }
 
-      // Create role
-      const role = await prisma.role.create({
+      // Create permission
+      const permission = await prisma.permission.create({
         data: {
-          name: validatedData.name,
+          code: validatedData.code,
           description: validatedData.description || null,
-          isSystem: false,
         },
         select: {
           id: true,
-          name: true,
+          code: true,
           description: true,
-          isSystem: true,
           createdAt: true,
           updatedAt: true,
         },
       });
 
-      return NextResponse.json({ data: role }, { status: 201 });
+      return NextResponse.json({ data: permission }, { status: 201 });
     } catch (error: any) {
       if (error.name === "ZodError") {
         return NextResponse.json(
@@ -168,7 +153,7 @@ export const POST = withPermission(
         );
       }
 
-      console.error("Create role error:", error);
+      console.error("Create permission error:", error);
       return NextResponse.json(
         { code: "SERVER_ERROR", message: "Internal server error" },
         { status: 500 }
