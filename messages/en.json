@@ -783,9 +783,19 @@
       "action": "Action",
       "dateRange": "Date Range",
       "resource": "Resource",
+      "status": "Status",
       "allUsers": "All Users",
       "allActions": "All Actions",
-      "allResources": "All Resources"
+      "allResources": "All Resources",
+      "allStatuses": "All Statuses"
+    },
+    "status": {
+      "success": "Success",
+      "error": "Error"
+    },
+    "messages": {
+      "cleanupSuccess": "Successfully deleted {count} old audit logs",
+      "cleanupError": "Failed to delete old audit logs"
     },
     "columns": {
       "timestamp": "Timestamp",

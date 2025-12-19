@@ -783,9 +783,19 @@
       "action": "Hành động",
       "dateRange": "Khoảng thời gian",
       "resource": "Tài nguyên",
+      "status": "Trạng thái",
       "allUsers": "Tất cả người dùng",
       "allActions": "Tất cả hành động",
-      "allResources": "Tất cả tài nguyên"
+      "allResources": "Tất cả tài nguyên",
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "status": {
+      "success": "Thành công",
+      "error": "Lỗi"
+    },
+    "messages": {
+      "cleanupSuccess": "Đã xóa thành công {count} nhật ký cũ",
+      "cleanupError": "Xóa nhật ký cũ thất bại"
     },
     "columns": {
       "timestamp": "Thời gian",

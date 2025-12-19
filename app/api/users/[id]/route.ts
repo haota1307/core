@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { withPermission } from "@/lib/rbac";
 import bcrypt from "bcryptjs";
+import {
+  createAuditLog,
+  AuditAction,
+  getChanges,
+  formatEntityName,
+} from "@/lib/audit-log";
 
 type RouteParams = Promise<{ id: string }>;
 
@@ -11,7 +17,11 @@ type RouteParams = Promise<{ id: string }>;
  */
 export const GET = withPermission(
   "users.view",
-  async (request: NextRequest, { params }: { params: RouteParams }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: RouteParams },
+    authContext: any
+  ) => {
     try {
       const { id } = await params;
 
@@ -55,6 +65,18 @@ export const GET = withPermission(
         );
       }
 
+      // Log audit
+      await createAuditLog(
+        {
+          userId: authContext.user.id,
+          action: AuditAction.USER_VIEW,
+          entityType: "user",
+          entityId: user.id,
+          entityName: formatEntityName(user),
+        },
+        request
+      );
+
       return NextResponse.json({ data: user });
     } catch (error) {
       console.error("Get user error:", error);
@@ -72,7 +94,11 @@ export const GET = withPermission(
  */
 export const PATCH = withPermission(
   "users.edit",
-  async (request: NextRequest, { params }: { params: RouteParams }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: RouteParams },
+    authContext: any
+  ) => {
     try {
       const { id } = await params;
       const body = await request.json();
@@ -120,6 +146,9 @@ export const PATCH = withPermission(
         updateData.password = await bcrypt.hash(password, 10);
       }
 
+      // Get changes for audit log (excluding password)
+      const changes = getChanges(existingUser, updateData);
+
       // Update user
       const user = await prisma.user.update({
         where: { id },
@@ -143,6 +172,19 @@ export const PATCH = withPermission(
         },
       });
 
+      // Log audit
+      await createAuditLog(
+        {
+          userId: authContext.user.id,
+          action: AuditAction.USER_UPDATE,
+          entityType: "user",
+          entityId: user.id,
+          entityName: formatEntityName(user),
+          changes,
+        },
+        request
+      );
+
       return NextResponse.json({
         data: user,
         message: "User updated successfully",
@@ -163,7 +205,11 @@ export const PATCH = withPermission(
  */
 export const DELETE = withPermission(
   "users.delete",
-  async (request: NextRequest, { params }: { params: RouteParams }) => {
+  async (
+    request: NextRequest,
+    { params }: { params: RouteParams },
+    authContext: any
+  ) => {
     try {
       const { id } = await params;
 
@@ -190,6 +236,18 @@ export const DELETE = withPermission(
         where: { userId: id },
         data: { deletedAt: new Date() },
       });
+
+      // Log audit
+      await createAuditLog(
+        {
+          userId: authContext.user.id,
+          action: AuditAction.USER_DELETE,
+          entityType: "user",
+          entityId: existingUser.id,
+          entityName: formatEntityName(existingUser),
+        },
+        request
+      );
 
       return NextResponse.json({
         message: "User deleted successfully",

@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { withPermission } from "@/lib/rbac";
 import bcrypt from "bcryptjs";
+import {
+  createAuditLog,
+  AuditAction,
+  formatEntityName,
+} from "@/lib/audit-log";
 
 /**
  * GET /api/users
@@ -148,7 +153,7 @@ export const GET = withPermission(
  */
 export const POST = withPermission(
   "users.create",
-  async (request: NextRequest) => {
+  async (request: NextRequest, context: any, authContext: any) => {
     try {
       const body = await request.json();
       const { email, name, password, roleId } = body;
@@ -205,6 +210,22 @@ export const POST = withPermission(
           updatedAt: true,
         },
       });
+
+      // Log audit
+      await createAuditLog(
+        {
+          userId: authContext.user.id,
+          action: AuditAction.USER_CREATE,
+          entityType: "user",
+          entityId: user.id,
+          entityName: formatEntityName(user),
+          metadata: {
+            email: user.email,
+            roleId: user.roleId,
+          },
+        },
+        request
+      );
 
       return NextResponse.json(
         { data: user, message: "User created successfully" },

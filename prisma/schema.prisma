@@ -28,6 +28,7 @@ model User {
   refreshTokens RefreshToken[]
   uploadedMedia Media[]
   mediaFolders  MediaFolder[]
+  auditLogs     AuditLog[]
 
   @@index([email])
   @@index([roleId])
@@ -92,17 +93,17 @@ model RolePermission {
 }
 
 model MediaFolder {
-  id          String        @id @default(cuid())
-  name        String
-  parentId    String?
-  parent      MediaFolder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children    MediaFolder[] @relation("FolderHierarchy")
-  media       Media[]
-  createdBy   String
-  creator     User          @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  deletedAt   DateTime?
+  id        String        @id @default(cuid())
+  name      String
+  parentId  String?
+  parent    MediaFolder?  @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children  MediaFolder[] @relation("FolderHierarchy")
+  media     Media[]
+  createdBy String
+  creator   User          @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  deletedAt DateTime?
 
   @@index([parentId])
   @@index([createdBy])
@@ -156,4 +157,28 @@ model MediaUsage {
   @@index([mediaId])
   @@index([entityType, entityId])
   @@index([deletedAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String?
+  entityName String?
+  changes    Json?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  status     String   @default("success")
+  errorMsg   String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityType])
+  @@index([entityId])
+  @@index([createdAt])
+  @@index([status])
 }

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "@/lib/prisma";
+import { createAuditLog, AuditAction } from "@/lib/audit-log";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const JWT_REFRESH_SECRET =
@@ -75,6 +76,24 @@ export async function POST(request: NextRequest) {
         expiresAt,
       },
     });
+
+    // Log successful registration
+    await createAuditLog(
+      {
+        userId: user.id,
+        action: AuditAction.REGISTER,
+        entityType: "auth",
+        entityId: user.id,
+        entityName: user.email,
+        metadata: {
+          email: user.email,
+          name: user.name,
+          roleId: user.roleId,
+        },
+        status: "success",
+      },
+      request
+    );
 
     return NextResponse.json(
       {
