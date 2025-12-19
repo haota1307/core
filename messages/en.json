@@ -103,11 +103,19 @@
       "support": "Support Center"
     },
     "user": {
-      "upgrade": "Upgrade to Pro",
+      "profile": "Profile",
       "account": "Account",
-      "billing": "Billing",
       "notifications": "Notifications",
-      "logout": "Log out"
+      "logout": "Log out",
+      "profileDialog": {
+        "title": "User Profile",
+        "description": "View detailed information about your account",
+        "nameLabel": "Name",
+        "emailLabel": "Email",
+        "roleLabel": "Role",
+        "userIdLabel": "User ID",
+        "noName": "No name set"
+      }
     }
   },
   "home": {

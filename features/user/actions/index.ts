@@ -17,7 +17,7 @@ export async function getUsersAction(query: GetUsersQuery) {
     params.append("page", query.page.toString());
     params.append("limit", query.limit.toString());
     if (query.search) params.append("search", query.search);
-    
+
     // Support multiple roleIds
     if (query.roleId) {
       if (Array.isArray(query.roleId)) {
@@ -26,7 +26,7 @@ export async function getUsersAction(query: GetUsersQuery) {
         params.append("roleId", query.roleId);
       }
     }
-    
+
     // Support multiple statuses
     if (query.status) {
       if (Array.isArray(query.status)) {
@@ -35,7 +35,7 @@ export async function getUsersAction(query: GetUsersQuery) {
         params.append("status", query.status);
       }
     }
-    
+
     if (query.sortBy) params.append("sortBy", query.sortBy);
     if (query.sortOrder) params.append("sortOrder", query.sortOrder);
 
@@ -128,13 +128,36 @@ export async function deleteUserAction(id: string) {
  */
 export async function getRolesAction() {
   try {
-    const response = await http.get<{ data: RoleResponse[] }>("/api/roles/list");
+    const response = await http.get<{ data: RoleResponse[] }>(
+      "/api/roles/list"
+    );
     return { success: true, data: response.data };
   } catch (error: any) {
     console.error("Get roles error:", error);
     return {
       success: false,
       error: error.message || "Failed to fetch roles",
+    };
+  }
+}
+
+/**
+ * Lấy thông tin user hiện tại
+ */
+export interface CurrentUserData {
+  user: UserResponse;
+  permissions: string[];
+}
+
+export async function getCurrentUserAction() {
+  try {
+    const response = await http.get<{ data: CurrentUserData }>("/api/auth/me");
+    return { success: true, data: response.data };
+  } catch (error: any) {
+    console.error("Get current user error:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to fetch current user",
     };
   }
 }

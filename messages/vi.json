@@ -103,11 +103,19 @@
       "support": "Trung tâm hỗ trợ"
     },
     "user": {
-      "upgrade": "Nâng cấp Pro",
+      "profile": "Thông tin cá nhân",
       "account": "Tài khoản",
-      "billing": "Thanh toán",
       "notifications": "Thông báo",
-      "logout": "Đăng xuất"
+      "logout": "Đăng xuất",
+      "profileDialog": {
+        "title": "Thông tin cá nhân",
+        "description": "Xem thông tin chi tiết về tài khoản của bạn",
+        "nameLabel": "Tên",
+        "emailLabel": "Email",
+        "roleLabel": "Vai trò",
+        "userIdLabel": "ID người dùng",
+        "noName": "Chưa có tên"
+      }
     }
   },
   "home": {

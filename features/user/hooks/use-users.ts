@@ -55,6 +55,8 @@ export function useUser(id: string) {
       if (!result.success) {
         throw new Error(result.error);
       }
+
+      console.log("[useUser] result:", result);
       return result.data;
     },
     enabled: !!id,
