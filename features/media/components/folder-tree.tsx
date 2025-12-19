@@ -31,6 +31,7 @@ interface FolderTreeProps {
   onCreateFolder?: (parentId: string | null) => void;
   onEditFolder?: (folder: MediaFolderResponse) => void;
   onDeleteFolder?: (folder: MediaFolderResponse) => void;
+  onMediaDrop?: (draggedItem: any, targetFolderId: string | null) => void;
 }
 
 interface FolderNodeProps {
@@ -43,6 +44,7 @@ interface FolderNodeProps {
   onCreateSubfolder?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onDrop?: (draggedItem: any, targetFolderId: string) => void;
 }
 
 function FolderNode({
@@ -55,18 +57,50 @@ function FolderNode({
   onCreateSubfolder,
   onEdit,
   onDelete,
+  onDrop,
 }: FolderNodeProps) {
   const tCommon = useTranslations("common");
   const hasChildren = folder._count.children > 0;
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    try {
+      const data = JSON.parse(e.dataTransfer.getData("application/json"));
+      if (data.type === "folder" && data.id === folder.id) {
+        return; // Don't drop on itself
+      }
+      onDrop?.(data, folder.id);
+    } catch (error) {
+      console.error("Drop error:", error);
+    }
+  };
 
   return (
     <div>
       <div
         className={cn(
           "group flex items-center gap-1 rounded-md px-2 py-1.5 text-sm hover:bg-accent cursor-pointer",
-          isActive && "bg-accent font-medium"
+          isActive && "bg-accent font-medium",
+          isDragOver && "bg-primary/20 ring-2 ring-primary"
         )}
         style={{ paddingLeft: `${level * 12 + 8}px` }}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
       >
         {/* Expand/Collapse button */}
         {hasChildren ? (
@@ -162,6 +196,7 @@ export function FolderTree({
   onCreateFolder,
   onEditFolder,
   onDeleteFolder,
+  onMediaDrop,
 }: FolderTreeProps) {
   const t = useTranslations("media.folder");
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
@@ -242,6 +277,7 @@ export function FolderTree({
           isExpanded={isExpanded}
           onToggle={() => toggleFolder(folder.id)}
           onClick={() => onFolderClick(folder.id)}
+          onDrop={onMediaDrop}
           onCreateSubfolder={
             onCreateFolder ? () => onCreateFolder(folder.id) : undefined
           }

@@ -134,3 +134,32 @@ export function useDeleteFolder() {
     },
   });
 }
+
+// Move folder
+export function useMoveFolder() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("media.folder");
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      parentId,
+    }: {
+      id: string;
+      parentId: string | null;
+    }) => {
+      const response = await http.patch<{ data: any }>(
+        `/api/media/folders/${id}/move`,
+        { parentId }
+      );
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: folderKeys.all });
+      toast.success(t("moveSuccess"));
+    },
+    onError: (error: Error) => {
+      toast.error(t("moveError"));
+    },
+  });
+}

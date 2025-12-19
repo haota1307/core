@@ -1,9 +1,14 @@
 import {
   BarChart3,
+  Bell,
   FileText,
+  Globe,
+  HardDrive,
   KeyRound,
   LayoutDashboard,
   LifeBuoy,
+  Lock,
+  Search,
   Settings2,
   ShieldCheck,
   Users,
@@ -130,18 +135,27 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
         {
           title: tNavItems("general"),
           url: "/dashboard/settings/general",
-        },
-        {
-          title: tNavItems("appearance"),
-          url: "/dashboard/settings/appearance",
-        },
-        {
-          title: tNavItems("integrations"),
-          url: "/dashboard/settings/integrations",
+          permission: "settings.view",
         },
         {
           title: tNavItems("security"),
           url: "/dashboard/settings/security",
+          permission: "settings.view",
+        },
+        {
+          title: tNavItems("mediaSettings"),
+          url: "/dashboard/settings/media",
+          permission: "settings.view",
+        },
+        {
+          title: tNavItems("notifications"),
+          url: "/dashboard/settings/notifications",
+          permission: "settings.view",
+        },
+        {
+          title: tNavItems("seo"),
+          url: "/dashboard/settings/seo",
+          permission: "settings.view",
         },
       ],
     },
@@ -164,5 +178,3 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
     },
   ],
 });
-
-

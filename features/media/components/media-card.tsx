@@ -11,7 +11,8 @@ import {
   Download,
   FileText,
   Film,
-  File
+  File,
+  FolderInput
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -29,6 +30,7 @@ interface MediaCardProps {
   media: MediaResponse;
   onEdit?: (media: MediaResponse) => void;
   onDelete?: (media: MediaResponse) => void;
+  onMove?: (media: MediaResponse) => void;
   onSelect?: (media: MediaResponse) => void;
   selectable?: boolean;
   selected?: boolean;
@@ -38,6 +40,7 @@ interface MediaCardProps {
 export function MediaCard({
   media,
   onEdit,
+  onMove,
   onDelete,
   onSelect,
   selectable = false,
@@ -85,6 +88,21 @@ export function MediaCard({
     onDelete?.(media);
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    if (!onMove) return; // Only allow drag if move is enabled
+    setIsDragging(true);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("application/json", JSON.stringify({
+      type: "media",
+      id: media.id,
+      name: media.originalName,
+    }));
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
   const getFileIcon = () => {
     if (isImage) return null; // Show thumbnail
     if (isVideo) return <Film className="h-12 w-12 text-blue-500" />;
@@ -106,13 +124,9 @@ export function MediaCard({
         selectable && "select-none"
       )}
       onClick={() => selectable && onSelect?.(media)}
-      draggable
-      onDragStart={(e) => {
-        setIsDragging(true);
-        e.dataTransfer.effectAllowed = "move";
-        e.dataTransfer.setData("mediaId", media.id);
-      }}
-      onDragEnd={() => setIsDragging(false)}
+      draggable={!!onMove}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
     >
       {/* Thumbnail/Icon */}
       <div className="relative w-full aspect-square mb-2 rounded-md overflow-hidden bg-muted flex items-center justify-center">
@@ -179,14 +193,18 @@ export function MediaCard({
               <Download className="mr-2 h-4 w-4" />
               {t("actions.download")}
             </DropdownMenuItem>
+            {(onEdit || onMove || onDelete) && <DropdownMenuSeparator />}
+            {onMove && (
+              <DropdownMenuItem onClick={() => onMove(media)}>
+                <FolderInput className="mr-2 h-4 w-4" />
+                {t("actions.move")}
+              </DropdownMenuItem>
+            )}
             {onEdit && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleEdit}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  {t("actions.edit")}
-                </DropdownMenuItem>
-              </>
+              <DropdownMenuItem onClick={handleEdit}>
+                <Edit className="mr-2 h-4 w-4" />
+                {t("actions.edit")}
+              </DropdownMenuItem>
             )}
             {onDelete && (
               <DropdownMenuItem

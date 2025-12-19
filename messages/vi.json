@@ -94,9 +94,10 @@
       "conversions": "Chuyển đổi",
       "settings": "Cài đặt",
       "general": "Tổng quan",
-      "appearance": "Giao diện",
-      "integrations": "Tích hợp",
       "security": "Bảo mật",
+      "mediaSettings": "Cài đặt Media",
+      "notifications": "Thông báo",
+      "seo": "SEO & Mạng xã hội",
       "auditLogs": "Nhật ký kiểm tra",
       "apiKeys": "Khóa API",
       "support": "Trung tâm hỗ trợ"
@@ -356,12 +357,19 @@
       "deleteDescription": "Hành động này sẽ xóa thư mục và chuyển tất cả media bên trong về thư mục gốc. Không thể hoàn tác.",
       "delete": "Xóa",
       "deleting": "Đang xóa...",
+      "moveTitle": "Di chuyển thư mục",
+      "moveDescription": "Chọn thư mục đích",
+      "moveButton": "Di chuyển",
+      "moving": "Đang di chuyển...",
+      "selectDestination": "Chọn thư mục đích",
       "createSuccess": "Tạo thư mục thành công",
       "updateSuccess": "Cập nhật thư mục thành công",
       "deleteSuccess": "Xóa thư mục thành công",
+      "moveSuccess": "Di chuyển thư mục thành công",
       "createError": "Tạo thư mục thất bại",
       "updateError": "Cập nhật thư mục thất bại",
-      "deleteError": "Xóa thư mục thất bại"
+      "deleteError": "Xóa thư mục thất bại",
+      "moveError": "Di chuyển thư mục thất bại"
     },
     "upload": {
       "title": "Tải lên Media",
@@ -431,19 +439,407 @@
     "actions": {
       "view": "Xem chi tiết",
       "edit": "Chỉnh sửa",
+      "move": "Di chuyển",
       "delete": "Xóa",
       "copyUrl": "Sao chép URL",
       "download": "Tải xuống"
+    },
+    "move": {
+      "title": "Di chuyển vào thư mục",
+      "description": "Chọn thư mục đích cho media này",
+      "selectFolder": "Chọn thư mục",
+      "moveButton": "Di chuyển",
+      "moving": "Đang di chuyển...",
+      "cancel": "Hủy"
     },
     "messages": {
       "uploadSuccess": "Tải lên media thành công",
       "updateSuccess": "Cập nhật media thành công",
       "deleteSuccess": "Xóa media thành công",
+      "moveSuccess": "Di chuyển media thành công",
       "uploadError": "Tải lên media thất bại",
       "updateError": "Cập nhật media thất bại",
       "deleteError": "Xóa media thất bại",
+      "moveError": "Di chuyển media thất bại",
       "deleteErrorInUse": "Không thể xóa media đang được sử dụng",
       "urlCopied": "Đã sao chép URL vào clipboard"
+    }
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "description": "Quản lý cấu hình hệ thống và tùy chọn",
+    "tabs": {
+      "general": "Tổng quan",
+      "security": "Bảo mật",
+      "media": "Media",
+      "notifications": "Thông báo",
+      "seo": "SEO"
+    },
+    "general": {
+      "title": "Cài đặt chung",
+      "description": "Cấu hình cài đặt hệ thống cơ bản và thông tin trang",
+      "siteInfo": {
+        "title": "Thông tin trang web",
+        "description": "Thông tin cơ bản về trang web của bạn",
+        "siteName": "Tên trang web",
+        "siteNamePlaceholder": "Trang web của tôi",
+        "siteNameDescription": "Tên trang web hiển thị trên tab trình duyệt và header",
+        "siteDescription": "Mô tả trang web",
+        "siteDescriptionPlaceholder": "Mô tả ngắn về trang web của bạn",
+        "siteDescriptionDescription": "Sử dụng cho mô tả meta SEO",
+        "logo": "Logo",
+        "logoDescription": "Tải lên logo trang web (kích thước khuyến nghị: 200x50px)",
+        "favicon": "Favicon",
+        "faviconDescription": "Tải lên favicon (kích thước khuyến nghị: 32x32px)",
+        "changeLogo": "Thay đổi Logo",
+        "changeFavicon": "Thay đổi Favicon"
+      },
+      "localization": {
+        "title": "Địa phương hóa",
+        "description": "Cấu hình ngôn ngữ và cài đặt khu vực",
+        "defaultLanguage": "Ngôn ngữ mặc định",
+        "defaultLanguageDescription": "Ngôn ngữ mặc định cho trang web của bạn",
+        "timezone": "Múi giờ",
+        "timezoneDescription": "Múi giờ được sử dụng để hiển thị ngày và giờ",
+        "dateFormat": "Định dạng ngày",
+        "dateFormatDescription": "Cách hiển thị ngày trên trang",
+        "timeFormat": "Định dạng giờ",
+        "timeFormatDescription": "Định dạng 12 giờ hoặc 24 giờ"
+      },
+      "maintenance": {
+        "title": "Chế độ bảo trì",
+        "description": "Kiểm soát trạng thái hoạt động của trang",
+        "enabled": "Bật chế độ bảo trì",
+        "enabledDescription": "Khi bật, chỉ quản trị viên mới có thể truy cập trang",
+        "message": "Thông báo bảo trì",
+        "messagePlaceholder": "Chúng tôi đang thực hiện bảo trì định kỳ...",
+        "messageDescription": "Thông báo hiển thị cho khách truy cập trong thời gian bảo trì"
+      }
+    },
+    "security": {
+      "title": "Cài đặt bảo mật",
+      "description": "Cấu hình xác thực và chính sách bảo mật",
+      "authentication": {
+        "title": "Phương thức xác thực",
+        "description": "Cấu hình cách người dùng có thể đăng nhập",
+        "emailPassword": "Email & Mật khẩu",
+        "emailPasswordDescription": "Cho phép đăng nhập bằng email và mật khẩu",
+        "oauth": "Nhà cung cấp OAuth",
+        "oauthDescription": "Cho phép đăng nhập bằng tài khoản mạng xã hội",
+        "google": "Google",
+        "github": "GitHub",
+        "facebook": "Facebook",
+        "emailVerification": "Yêu cầu xác minh email",
+        "emailVerificationDescription": "Người dùng phải xác minh email trước khi truy cập hệ thống"
+      },
+      "passwordPolicy": {
+        "title": "Chính sách mật khẩu",
+        "description": "Cấu hình yêu cầu mật khẩu",
+        "minLength": "Độ dài tối thiểu",
+        "minLengthDescription": "Số ký tự tối thiểu được yêu cầu",
+        "requireUppercase": "Yêu cầu chữ hoa",
+        "requireUppercaseDescription": "Mật khẩu phải chứa ít nhất một chữ cái viết hoa",
+        "requireLowercase": "Yêu cầu chữ thường",
+        "requireLowercaseDescription": "Mật khẩu phải chứa ít nhất một chữ cái viết thường",
+        "requireNumbers": "Yêu cầu số",
+        "requireNumbersDescription": "Mật khẩu phải chứa ít nhất một số",
+        "requireSpecial": "Yêu cầu ký tự đặc biệt",
+        "requireSpecialDescription": "Mật khẩu phải chứa ít nhất một ký tự đặc biệt",
+        "expirationDays": "Hạn sử dụng mật khẩu (Ngày)",
+        "expirationDaysDescription": "Số ngày trước khi mật khẩu hết hạn (0 = không hết hạn)"
+      },
+      "twoFactor": {
+        "title": "Xác thực hai yếu tố",
+        "description": "Lớp bảo mật bổ sung cho tài khoản người dùng",
+        "enabled": "Bật 2FA",
+        "enabledDescription": "Cho phép người dùng thiết lập xác thực hai yếu tố",
+        "required": "Bắt buộc 2FA cho Admin",
+        "requiredDescription": "Quản trị viên phải bật 2FA",
+        "methods": "Phương thức 2FA",
+        "totp": "Ứng dụng xác thực (TOTP)",
+        "email": "Mã qua Email",
+        "sms": "Mã SMS"
+      },
+      "session": {
+        "title": "Quản lý phiên",
+        "description": "Cấu hình bảo mật phiên đăng nhập",
+        "timeout": "Thời gian chờ phiên (Phút)",
+        "timeoutDescription": "Số phút không hoạt động trước khi tự động đăng xuất",
+        "maxSessions": "Số phiên tối đa",
+        "maxSessionsDescription": "Số phiên đồng thời tối đa cho mỗi người dùng",
+        "loginAttempts": "Số lần đăng nhập tối đa",
+        "loginAttemptsDescription": "Số lần thất bại trước khi khóa tài khoản",
+        "lockoutDuration": "Thời gian khóa (Phút)",
+        "lockoutDurationDescription": "Số phút trước khi tài khoản bị khóa có thể thử lại"
+      },
+      "ipRestriction": {
+        "title": "Hạn chế IP",
+        "description": "Kiểm soát truy cập theo địa chỉ IP",
+        "adminWhitelist": "Danh sách IP được phép (Admin)",
+        "adminWhitelistDescription": "Chỉ những IP này có thể truy cập khu vực quản trị (mỗi dòng một IP)",
+        "blacklist": "Danh sách IP bị chặn",
+        "blacklistDescription": "Chặn truy cập từ những IP này (mỗi dòng một IP)"
+      }
+    },
+    "media": {
+      "title": "Cài đặt Media",
+      "description": "Cấu hình tải lên và lưu trữ tệp",
+      "storage": {
+        "title": "Cấu hình lưu trữ",
+        "description": "Chọn nơi lưu trữ tệp tải lên",
+        "provider": "Nhà cung cấp lưu trữ",
+        "providerDescription": "Chọn dịch vụ lưu trữ ưa thích của bạn",
+        "local": "Lưu trữ cục bộ",
+        "s3": "Amazon S3",
+        "cloudinary": "Cloudinary",
+        "r2": "Cloudflare R2",
+        "accessKey": "Access Key",
+        "secretKey": "Secret Key",
+        "bucket": "Tên Bucket",
+        "region": "Khu vực",
+        "endpoint": "Endpoint tùy chỉnh",
+        "cloudName": "Cloud Name",
+        "apiKey": "API Key",
+        "apiSecret": "API Secret"
+      },
+      "limits": {
+        "title": "Giới hạn tải lên",
+        "description": "Đặt giới hạn kích thước và loại tệp",
+        "maxFileSize": "Kích thước tệp tối đa (MB)",
+        "maxFileSizeDescription": "Kích thước tối đa cho tệp tải lên",
+        "allowedTypes": "Loại tệp được phép",
+        "allowedTypesDescription": "Các phần mở rộng tệp có thể tải lên",
+        "images": "Hình ảnh (jpg, png, gif, webp, svg)",
+        "videos": "Video (mp4, webm, mov)",
+        "documents": "Tài liệu (pdf, doc, docx, xls, xlsx)",
+        "audio": "Âm thanh (mp3, wav, ogg)"
+      },
+      "processing": {
+        "title": "Xử lý hình ảnh",
+        "description": "Cài đặt tối ưu hóa hình ảnh tự động",
+        "autoCompress": "Tự động nén hình ảnh",
+        "autoCompressDescription": "Tự động nén hình ảnh khi tải lên",
+        "quality": "Chất lượng nén",
+        "qualityDescription": "Mức chất lượng cho hình ảnh nén (1-100)",
+        "maxDimensions": "Kích thước tối đa",
+        "maxDimensionsDescription": "Thay đổi kích thước hình ảnh lớn hơn này (rộng x cao)",
+        "generateThumbnails": "Tạo hình thu nhỏ",
+        "generateThumbnailsDescription": "Tự động tạo phiên bản hình thu nhỏ"
+      },
+      "folders": {
+        "title": "Thư mục mặc định",
+        "description": "Sắp xếp tệp tải lên theo danh mục",
+        "avatars": "avatars/",
+        "posts": "posts/",
+        "documents": "documents/",
+        "general": "general/"
+      },
+      "cleanup": {
+        "title": "Dọn dẹp lưu trữ",
+        "description": "Quản lý tệp không sử dụng",
+        "autoDelete": "Tự động xóa tệp không dùng",
+        "autoDeleteDescription": "Tự động xóa tệp không được liên kết với nội dung nào",
+        "retentionDays": "Thời gian lưu giữ (Ngày)",
+        "retentionDaysDescription": "Số ngày giữ tệp không sử dụng trước khi xóa"
+      }
+    },
+    "notifications": {
+      "title": "Cài đặt thông báo",
+      "description": "Cấu hình email và tùy chọn thông báo",
+      "email": {
+        "title": "Cấu hình Email",
+        "description": "Cài đặt SMTP để gửi email",
+        "provider": "Nhà cung cấp Email",
+        "providerDescription": "Chọn dịch vụ email của bạn",
+        "smtp": "SMTP tùy chỉnh",
+        "sendgrid": "SendGrid",
+        "mailgun": "Mailgun",
+        "ses": "Amazon SES",
+        "host": "SMTP Host",
+        "hostPlaceholder": "smtp.example.com",
+        "port": "SMTP Port",
+        "username": "Tên đăng nhập",
+        "password": "Mật khẩu",
+        "encryption": "Mã hóa",
+        "none": "Không",
+        "ssl": "SSL",
+        "tls": "TLS",
+        "fromName": "Tên người gửi",
+        "fromNamePlaceholder": "Trang web của tôi",
+        "fromEmail": "Email người gửi",
+        "fromEmailPlaceholder": "noreply@example.com",
+        "testEmail": "Gửi email thử",
+        "testEmailSuccess": "Gửi email thử thành công",
+        "testEmailError": "Gửi email thử thất bại"
+      },
+      "templates": {
+        "title": "Mẫu Email",
+        "description": "Tùy chỉnh nội dung email",
+        "welcome": "Email chào mừng",
+        "passwordReset": "Đặt lại mật khẩu",
+        "emailVerification": "Xác minh email",
+        "loginNotification": "Thông báo đăng nhập",
+        "edit": "Chỉnh sửa mẫu",
+        "preview": "Xem trước"
+      },
+      "triggers": {
+        "title": "Kích hoạt thông báo",
+        "description": "Chọn thời điểm gửi thông báo",
+        "onRegister": "Đăng ký người dùng",
+        "onRegisterDescription": "Gửi email chào mừng khi người dùng đăng ký",
+        "onPasswordReset": "Yêu cầu đặt lại mật khẩu",
+        "onPasswordResetDescription": "Gửi liên kết đặt lại khi được yêu cầu",
+        "onLogin": "Đăng nhập mới",
+        "onLoginDescription": "Thông báo cho người dùng về đăng nhập mới từ thiết bị lạ",
+        "onRoleChange": "Thay đổi vai trò",
+        "onRoleChangeDescription": "Thông báo cho người dùng khi vai trò của họ bị thay đổi",
+        "systemAlerts": "Cảnh báo hệ thống",
+        "systemAlertsDescription": "Gửi cảnh báo về sự kiện hệ thống cho quản trị viên"
+      },
+      "webPush": {
+        "title": "Thông báo đẩy Web",
+        "description": "Cài đặt thông báo đẩy trình duyệt",
+        "enabled": "Bật thông báo đẩy",
+        "enabledDescription": "Cho phép người dùng nhận thông báo trình duyệt",
+        "vapidPublic": "VAPID Public Key",
+        "vapidPrivate": "VAPID Private Key"
+      }
+    },
+    "seo": {
+      "title": "Cài đặt SEO & Mạng xã hội",
+      "description": "Cấu hình công cụ tìm kiếm và mạng xã hội",
+      "meta": {
+        "title": "Thẻ Meta mặc định",
+        "description": "Giá trị SEO dự phòng cho trang không có cài đặt tùy chỉnh",
+        "defaultTitle": "Tiêu đề trang mặc định",
+        "defaultTitlePlaceholder": "Trang web của tôi - Khẩu hiệu của bạn",
+        "defaultTitleDescription": "Sử dụng khi trang không có tiêu đề tùy chỉnh",
+        "titleSuffix": "Hậu tố tiêu đề",
+        "titleSuffixPlaceholder": " | Trang web của tôi",
+        "titleSuffixDescription": "Thêm vào cuối tất cả tiêu đề trang",
+        "defaultDescription": "Mô tả mặc định",
+        "defaultDescriptionPlaceholder": "Chào mừng đến với trang web của chúng tôi...",
+        "defaultDescriptionDescription": "Sử dụng khi trang không có mô tả tùy chỉnh",
+        "keywords": "Từ khóa mặc định",
+        "keywordsPlaceholder": "từ khóa1, từ khóa2, từ khóa3",
+        "keywordsDescription": "Từ khóa phân tách bằng dấu phẩy cho SEO"
+      },
+      "social": {
+        "title": "Mạng xã hội",
+        "description": "Cài đặt Open Graph và chia sẻ mạng xã hội",
+        "ogImage": "Hình ảnh OG mặc định",
+        "ogImageDescription": "Hình ảnh mặc định cho chia sẻ mạng xã hội (khuyến nghị 1200x630px)",
+        "changeOgImage": "Thay đổi hình ảnh",
+        "twitterCard": "Loại Twitter Card",
+        "summary": "Tóm tắt",
+        "summaryLarge": "Tóm tắt hình ảnh lớn",
+        "twitterHandle": "Twitter Handle",
+        "twitterHandlePlaceholder": "@yourhandle",
+        "facebookAppId": "Facebook App ID",
+        "facebookAppIdPlaceholder": "Facebook App ID của bạn"
+      },
+      "robots": {
+        "title": "Robots & Lập chỉ mục",
+        "description": "Kiểm soát thu thập dữ liệu của công cụ tìm kiếm",
+        "indexing": "Cho phép lập chỉ mục",
+        "indexingDescription": "Cho phép công cụ tìm kiếm lập chỉ mục trang của bạn",
+        "robotsTxt": "Nội dung robots.txt",
+        "robotsTxtDescription": "Quy tắc tùy chỉnh cho trình thu thập dữ liệu",
+        "sitemapEnabled": "Bật Sitemap",
+        "sitemapEnabledDescription": "Tự động tạo sitemap.xml",
+        "sitemapUrl": "URL Sitemap"
+      },
+      "analytics": {
+        "title": "Tích hợp Analytics",
+        "description": "Kết nối dịch vụ phân tích",
+        "googleAnalytics": "Google Analytics ID",
+        "googleAnalyticsPlaceholder": "G-XXXXXXXXXX",
+        "googleTagManager": "Google Tag Manager ID",
+        "googleTagManagerPlaceholder": "GTM-XXXXXXX",
+        "facebookPixel": "Facebook Pixel ID",
+        "facebookPixelPlaceholder": "Pixel ID của bạn"
+      }
+    },
+    "messages": {
+      "saveSuccess": "Lưu cài đặt thành công",
+      "saveError": "Lưu cài đặt thất bại",
+      "testSuccess": "Kiểm tra thành công",
+      "testError": "Kiểm tra thất bại"
+    },
+    "actions": {
+      "save": "Lưu thay đổi",
+      "saving": "Đang lưu...",
+      "reset": "Đặt lại mặc định",
+      "test": "Kiểm tra cấu hình"
+    }
+  },
+  "auditLog": {
+    "title": "Nhật ký kiểm tra",
+    "description": "Xem hoạt động hệ thống và hành động người dùng",
+    "searchPlaceholder": "Tìm kiếm nhật ký...",
+    "noResults": "Không tìm thấy nhật ký",
+    "filters": {
+      "user": "Người dùng",
+      "action": "Hành động",
+      "dateRange": "Khoảng thời gian",
+      "resource": "Tài nguyên",
+      "allUsers": "Tất cả người dùng",
+      "allActions": "Tất cả hành động",
+      "allResources": "Tất cả tài nguyên"
+    },
+    "columns": {
+      "timestamp": "Thời gian",
+      "user": "Người dùng",
+      "action": "Hành động",
+      "resource": "Tài nguyên",
+      "resourceId": "ID tài nguyên",
+      "ipAddress": "Địa chỉ IP",
+      "details": "Chi tiết"
+    },
+    "actions": {
+      "login": "Đăng nhập",
+      "logout": "Đăng xuất",
+      "create": "Tạo",
+      "update": "Cập nhật",
+      "delete": "Xóa",
+      "view": "Xem",
+      "export": "Xuất",
+      "import": "Nhập",
+      "passwordChange": "Đổi mật khẩu",
+      "roleChange": "Đổi vai trò",
+      "permissionChange": "Đổi quyền",
+      "settingsChange": "Đổi cài đặt"
+    },
+    "resources": {
+      "user": "Người dùng",
+      "role": "Vai trò",
+      "permission": "Quyền hạn",
+      "media": "Media",
+      "settings": "Cài đặt",
+      "session": "Phiên"
+    },
+    "detail": {
+      "title": "Chi tiết nhật ký",
+      "before": "Trước",
+      "after": "Sau",
+      "changes": "Thay đổi",
+      "userAgent": "User Agent",
+      "close": "Đóng"
+    },
+    "export": {
+      "title": "Xuất nhật ký",
+      "format": "Định dạng xuất",
+      "csv": "CSV",
+      "json": "JSON",
+      "dateRange": "Khoảng thời gian",
+      "exportButton": "Xuất",
+      "exporting": "Đang xuất..."
+    },
+    "pagination": {
+      "previous": "Trước",
+      "next": "Sau",
+      "page": "Trang {current} / {total}",
+      "showing": "Hiển thị {from} đến {to} trên {total}"
     }
   }
 }

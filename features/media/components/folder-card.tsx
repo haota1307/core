@@ -7,7 +7,8 @@ import {
   MoreHorizontal, 
   Edit, 
   Trash2,
-  FolderOpen
+  FolderOpen,
+  FolderInput
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -29,6 +30,7 @@ interface FolderCardProps {
   };
   onOpen?: (folderId: string) => void;
   onEdit?: (folder: any) => void;
+  onMove?: (folder: any) => void;
   onDelete?: (folder: any) => void;
   selected?: boolean;
 }
@@ -37,11 +39,14 @@ export function FolderCard({
   folder,
   onOpen,
   onEdit,
+  onMove,
   onDelete,
   selected = false,
 }: FolderCardProps) {
   const t = useTranslations("media");
   const [isHovered, setIsHovered] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -53,16 +58,79 @@ export function FolderCard({
     onDelete?.(folder);
   };
 
+  const handleDragStart = (e: React.DragEvent) => {
+    if (!onMove) return;
+    setIsDragging(true);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("application/json", JSON.stringify({
+      type: "folder",
+      id: folder.id,
+      name: folder.name,
+    }));
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = "move";
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    try {
+      const data = JSON.parse(e.dataTransfer.getData("application/json"));
+      
+      // Don't allow dropping folder into itself
+      if (data.type === "folder" && data.id === folder.id) {
+        return;
+      }
+
+      // Emit drop event to parent
+      const dropEvent = new CustomEvent("mediaDrop", {
+        detail: {
+          draggedItem: data,
+          targetFolderId: folder.id,
+        },
+        bubbles: true,
+      });
+      e.currentTarget.dispatchEvent(dropEvent);
+    } catch (error) {
+      console.error("Drop error:", error);
+    }
+  };
+
   return (
     <div
       className={cn(
         "group relative flex flex-col items-center p-3 rounded-lg transition-all",
         "hover:bg-accent/50 cursor-pointer",
-        selected && "bg-accent ring-2 ring-primary"
+        selected && "bg-accent ring-2 ring-primary",
+        isDragging && "opacity-50",
+        isDragOver && "ring-2 ring-primary bg-primary/10"
       )}
       onClick={() => onOpen?.(folder.id)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      draggable={!!onMove}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       {/* Folder Icon */}
       <div className="relative w-full aspect-square mb-2 rounded-md flex items-center justify-center">
@@ -107,6 +175,12 @@ export function FolderCard({
               <DropdownMenuItem onClick={handleEdit}>
                 <Edit className="mr-2 h-4 w-4" />
                 Rename
+              </DropdownMenuItem>
+            )}
+            {onMove && (
+              <DropdownMenuItem onClick={() => onMove(folder)}>
+                <FolderInput className="mr-2 h-4 w-4" />
+                Move
               </DropdownMenuItem>
             )}
             {onDelete && (

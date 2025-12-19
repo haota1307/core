@@ -157,3 +157,29 @@ export function useDeleteMedia() {
     },
   });
 }
+
+// Move media
+export function useMoveMedia() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("media.messages");
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      folderId,
+    }: {
+      id: string;
+      folderId: string | null;
+    }) => {
+      await http.patch(`/api/media/${id}/move`, { folderId });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: mediaKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: folderKeys.all });
+      toast.success(t("moveSuccess"));
+    },
+    onError: (error: Error) => {
+      toast.error(t("moveError"));
+    },
+  });
+}

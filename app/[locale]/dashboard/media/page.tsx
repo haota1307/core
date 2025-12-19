@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Upload, FolderPlus, Home, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,13 +11,15 @@ import {
   MediaUploadDialog,
   MediaEditDialog,
   MediaDeleteDialog,
+  MediaMoveDialog,
   FolderCard,
   FolderDialog,
   FolderDeleteDialog,
+  FolderMoveDialog,
   FolderTree,
 } from "@/features/media/components";
-import { useMedia } from "@/features/media/hooks/use-media";
-import { useFolders } from "@/features/media/hooks/use-folders";
+import { useMedia, useMoveMedia } from "@/features/media/hooks/use-media";
+import { useFolders, useMoveFolder } from "@/features/media/hooks/use-folders";
 import { MediaResponse, MediaFolderResponse } from "@/features/media/schemas";
 import { useHasPermission } from "@/lib/hooks/use-permissions";
 import { Search } from "lucide-react";
@@ -32,6 +34,10 @@ const MediaPage = () => {
   const tCommon = useTranslations("common");
   const t = useTranslations("media");
 
+  const moveMedia = useMoveMedia();
+  const moveFolder = useMoveFolder();
+  const gridRef = useRef<HTMLDivElement>(null);
+
   const [search, setSearch] = useState("");
   const [mimeTypeFilter, setMimeTypeFilter] = useState<string | undefined>();
   const [page, setPage] = useState(1);
@@ -40,11 +46,13 @@ const MediaPage = () => {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [editingMedia, setEditingMedia] = useState<MediaResponse | null>(null);
   const [deletingMedia, setDeletingMedia] = useState<MediaResponse | null>(null);
+  const [movingMedia, setMovingMedia] = useState<MediaResponse | null>(null);
 
   const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
   const [folderDialogParentId, setFolderDialogParentId] = useState<string | null>(null);
   const [editingFolder, setEditingFolder] = useState<MediaFolderResponse | null>(null);
   const [deletingFolder, setDeletingFolder] = useState<MediaFolderResponse | null>(null);
+  const [movingFolder, setMovingFolder] = useState<MediaFolderResponse | null>(null);
 
   // Fetch ALL folders for tree view (no filter)
   const { data: allFoldersData } = useFolders();
@@ -87,6 +95,35 @@ const MediaPage = () => {
     setIsFolderDialogOpen(true);
   };
 
+  // Handle drag & drop
+  const handleMediaDrop = (draggedItem: { type: string; id: string }, targetFolderId: string | null) => {
+    if (draggedItem.type === "media") {
+      // Move media to folder directly
+      moveMedia.mutate({ id: draggedItem.id, folderId: targetFolderId });
+    } else if (draggedItem.type === "folder") {
+      // Move folder to another folder directly
+      moveFolder.mutate({ id: draggedItem.id, parentId: targetFolderId });
+    }
+  };
+
+  // Listen for custom drop events from FolderCard
+  useEffect(() => {
+    const handleCustomDrop = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        handleMediaDrop(customEvent.detail.draggedItem, customEvent.detail.targetFolderId);
+      }
+    };
+
+    const gridElement = gridRef.current;
+    if (gridElement) {
+      gridElement.addEventListener("mediaDrop", handleCustomDrop);
+      return () => {
+        gridElement.removeEventListener("mediaDrop", handleCustomDrop);
+      };
+    }
+  }, [moveMedia, moveFolder]);
+
   // Check permission
   // Show loading while checking permissions
   if (permissionsLoading) {
@@ -123,6 +160,7 @@ const MediaPage = () => {
           onCreateFolder={hasManagePermission ? handleCreateFolder : undefined}
           onEditFolder={hasManagePermission ? handleEditFolder : undefined}
           onDeleteFolder={hasManagePermission ? setDeletingFolder : undefined}
+          onMediaDrop={handleMediaDrop}
         />
       </div>
 
@@ -233,7 +271,10 @@ const MediaPage = () => {
               </div>
 
               {/* Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
+              <div 
+                ref={gridRef}
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4"
+              >
                 {/* Folders first */}
                 {currentFolders.map((folder) => (
                   <FolderCard
@@ -241,6 +282,7 @@ const MediaPage = () => {
                     folder={folder}
                     onOpen={() => handleFolderClick(folder.id)}
                     onEdit={hasManagePermission ? handleEditFolder : undefined}
+                    onMove={hasManagePermission ? setMovingFolder : undefined}
                     onDelete={hasManagePermission ? setDeletingFolder : undefined}
                   />
                 ))}
@@ -251,6 +293,7 @@ const MediaPage = () => {
                     key={media.id}
                     media={media}
                     onEdit={hasEditPermission ? setEditingMedia : undefined}
+                    onMove={hasEditPermission ? setMovingMedia : undefined}
                     onDelete={hasDeletePermission ? setDeletingMedia : undefined}
                   />
                 ))}
@@ -328,6 +371,12 @@ const MediaPage = () => {
         media={deletingMedia}
       />
 
+      <MediaMoveDialog
+        open={!!movingMedia}
+        onOpenChange={(open) => !open && setMovingMedia(null)}
+        media={movingMedia}
+      />
+
       <FolderDialog
         open={isFolderDialogOpen}
         onOpenChange={(open) => {
@@ -345,6 +394,12 @@ const MediaPage = () => {
         open={!!deletingFolder}
         onOpenChange={(open) => !open && setDeletingFolder(null)}
         folder={deletingFolder}
+      />
+
+      <FolderMoveDialog
+        open={!!movingFolder}
+        onOpenChange={(open) => !open && setMovingFolder(null)}
+        folder={movingFolder}
       />
     </div>
   );
