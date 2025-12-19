@@ -20,8 +20,6 @@ export function useCurrentUser() {
       if (!result.success) {
         throw new Error(result.error);
       }
-
-      console.log("[useCurrentUser] result:", result);
       return result.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes

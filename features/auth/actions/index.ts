@@ -99,6 +99,8 @@ export async function refreshTokenAction(
 
 /**
  * Server action: Logout
+ * Note: If token is expired/invalid (401), we still treat it as success
+ * because the user is effectively logged out already
  */
 export async function logoutAction(): Promise<ActionResult<void>> {
   try {
@@ -107,6 +109,13 @@ export async function logoutAction(): Promise<ActionResult<void>> {
     });
     return { success: true, data: undefined };
   } catch (error: any) {
+    // If token is missing/expired (401), treat as success
+    // User is already logged out or token is invalid
+    if (error.status === 401) {
+      return { success: true, data: undefined };
+    }
+
+    // For other errors, return failure
     return {
       success: false,
       error: {

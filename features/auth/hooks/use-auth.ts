@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { loginAction, registerAction, logoutAction } from "../actions";
@@ -8,7 +8,6 @@ import type { LoginInput, RegisterInput } from "../schemas";
 import { toast } from "sonner";
 import { storeTokens, clearTokens } from "@/lib/cookies";
 import { clearPermissionsCache } from "@/lib/hooks/use-permissions";
-import { http } from "@/lib/http";
 
 export const useLogin = () => {
   const router = useRouter();
@@ -79,6 +78,7 @@ export const useRegister = () => {
 export const useLogout = () => {
   const router = useRouter();
   const t = useTranslations("auth.errors");
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async () => {
@@ -92,9 +92,17 @@ export const useLogout = () => {
       clearTokens();
       // Clear permissions cache
       clearPermissionsCache();
+      // Clear all React Query cache
+      queryClient.clear();
       router.push("/auth/login");
     },
     onError: (error: any) => {
+      // Even if API call fails, still logout on client side
+      // This handles cases where token is expired or API is down
+      clearTokens();
+      clearPermissionsCache();
+      queryClient.clear();
+
       const errorCode = error.code || "UNKNOWN_ERROR";
       // Try to get translated message, fallback to original message or default
       let message: string;
@@ -104,6 +112,9 @@ export const useLogout = () => {
         message = error.message || t("UNKNOWN_ERROR");
       }
       toast.error(message);
+
+      // Still redirect to login even on error
+      router.push("/auth/login");
     },
   });
 };

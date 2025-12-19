@@ -94,11 +94,10 @@ export function useDeleteOldAuditLogs() {
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: auditLogKeys.lists() });
       queryClient.invalidateQueries({ queryKey: auditLogKeys.stats() });
-      toast.success(t("cleanupSuccess", { count: result.deletedCount }));
+      toast.success(t("cleanupSuccess", { count: result.deletedCount ?? 0 }));
     },
     onError: () => {
       toast.error(t("cleanupError"));
     },
   });
 }
-
