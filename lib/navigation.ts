@@ -134,17 +134,22 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
       items: [
         {
           title: tNavItems("general"),
-          url: "/dashboard/settings/general",
+          url: "/dashboard/settings",
           permission: "settings.view",
         },
         {
-          title: tNavItems("security"),
-          url: "/dashboard/settings/security",
+          title: tNavItems("email"),
+          url: "/dashboard/settings/email",
           permission: "settings.view",
         },
         {
           title: tNavItems("mediaSettings"),
           url: "/dashboard/settings/media",
+          permission: "settings.view",
+        },
+        {
+          title: tNavItems("security"),
+          url: "/dashboard/settings/security",
           permission: "settings.view",
         },
         {
@@ -155,6 +160,16 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
         {
           title: tNavItems("seo"),
           url: "/dashboard/settings/seo",
+          permission: "settings.view",
+        },
+        {
+          title: tNavItems("localization"),
+          url: "/dashboard/settings/localization",
+          permission: "settings.view",
+        },
+        {
+          title: tNavItems("backup"),
+          url: "/dashboard/settings/backup",
           permission: "settings.view",
         },
       ],

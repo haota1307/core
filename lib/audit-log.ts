@@ -48,6 +48,10 @@ export enum AuditAction {
   FOLDER_VIEW = "folder.view",
   FOLDER_LIST = "folder.list",
   FOLDER_MOVE = "folder.move",
+
+  // Settings actions
+  SETTING_UPDATE = "setting.update",
+  SETTING_VIEW = "setting.view",
 }
 
 /**

@@ -25,6 +25,9 @@ const PERMISSIONS = [
   { code: "media.manage", desc: "Quản lý toàn bộ media" },
   { code: "audit_logs.view", desc: "Xem nhật ký hệ thống" },
   { code: "audit_logs.delete", desc: "Xóa nhật ký cũ" },
+  { code: "settings.view", desc: "Xem cài đặt hệ thống" },
+  { code: "settings.edit", desc: "Chỉnh sửa cài đặt hệ thống" },
+  { code: "settings.backup", desc: "Sao lưu & khôi phục dữ liệu" },
 ];
 
 // Roles với permissions
@@ -60,6 +63,9 @@ const ROLES = [
       "media.manage",
       "audit_logs.view",
       "audit_logs.delete",
+      "settings.view",
+      "settings.edit",
+      "settings.backup",
     ],
   },
   {

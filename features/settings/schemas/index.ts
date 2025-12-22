@@ -1,0 +1,265 @@
+import { z } from "zod";
+
+// ============================================
+// SETTING TYPES & ENUMS
+// ============================================
+
+export const SettingGroup = {
+  GENERAL: "general",
+  EMAIL: "email",
+  MEDIA: "media",
+  SECURITY: "security",
+  NOTIFICATION: "notification",
+  SEO: "seo",
+  LOCALIZATION: "localization",
+  BACKUP: "backup",
+} as const;
+
+export type SettingGroupType = (typeof SettingGroup)[keyof typeof SettingGroup];
+
+export const SettingType = {
+  STRING: "string",
+  NUMBER: "number",
+  BOOLEAN: "boolean",
+  JSON: "json",
+  ARRAY: "array",
+} as const;
+
+export type SettingTypeValue = (typeof SettingType)[keyof typeof SettingType];
+
+// ============================================
+// BASE SCHEMAS
+// ============================================
+
+export const settingSchema = z.object({
+  id: z.string(),
+  key: z.string(),
+  value: z.unknown(),
+  group: z.string(),
+  type: z.string(),
+  label: z.string().nullable(),
+  description: z.string().nullable(),
+  isPublic: z.boolean(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export type SettingResponse = z.infer<typeof settingSchema>;
+
+// ============================================
+// GENERAL SETTINGS
+// ============================================
+
+export const generalSettingsSchema = z.object({
+  siteName: z.string().min(1, "Site name is required"),
+  siteDescription: z.string().optional(),
+  siteLogo: z.string().optional(),
+  favicon: z.string().optional(),
+  contactEmail: z
+    .string()
+    .email("Invalid email format")
+    .optional()
+    .or(z.literal("")),
+  contactPhone: z.string().optional(),
+  address: z.string().optional(),
+  timezone: z.string(),
+  dateFormat: z.string(),
+  maintenanceMode: z.boolean(),
+});
+
+export type GeneralSettingsInput = z.infer<typeof generalSettingsSchema>;
+
+// ============================================
+// EMAIL SETTINGS
+// ============================================
+
+export const emailSettingsSchema = z.object({
+  smtpProvider: z.enum(["custom", "gmail", "sendgrid", "mailgun", "ses"]),
+  smtpHost: z.string().optional(),
+  smtpPort: z.number().int().positive(),
+  smtpSecure: z.boolean(),
+  smtpUsername: z.string().optional(),
+  smtpPassword: z.string().optional(),
+  fromName: z.string().optional(),
+  fromEmail: z
+    .string()
+    .email("Invalid email format")
+    .optional()
+    .or(z.literal("")),
+});
+
+export type EmailSettingsInput = z.infer<typeof emailSettingsSchema>;
+
+// ============================================
+// MEDIA SETTINGS
+// ============================================
+
+export const mediaSettingsSchema = z.object({
+  storageProvider: z.enum(["local", "s3", "cloudinary"]),
+  maxFileSize: z.number().int().positive(), // MB
+  allowedImageTypes: z.array(z.string()),
+  allowedDocumentTypes: z.array(z.string()),
+  allowedVideoTypes: z.array(z.string()),
+  imageQuality: z.number().int().min(1).max(100),
+  autoGenerateThumbnails: z.boolean(),
+  thumbnailSizes: z.array(z.string()),
+  enableWatermark: z.boolean(),
+  watermarkImage: z.string().optional(),
+  watermarkPosition: z.enum([
+    "top-left",
+    "top-right",
+    "bottom-left",
+    "bottom-right",
+    "center",
+  ]),
+  watermarkOpacity: z.number().int().min(1).max(100),
+});
+
+export type MediaSettingsInput = z.infer<typeof mediaSettingsSchema>;
+
+// ============================================
+// SECURITY SETTINGS
+// ============================================
+
+export const securitySettingsSchema = z.object({
+  requireTwoFactor: z.boolean(),
+  passwordMinLength: z.number().int().min(6).max(32),
+  passwordRequireUppercase: z.boolean(),
+  passwordRequireLowercase: z.boolean(),
+  passwordRequireNumber: z.boolean(),
+  passwordRequireSpecial: z.boolean(),
+  sessionTimeout: z.number().int().positive(), // minutes
+  maxLoginAttempts: z.number().int().positive(),
+  lockoutDuration: z.number().int().positive(), // minutes
+  enableCaptcha: z.boolean(),
+  captchaProvider: z.enum(["recaptcha", "hcaptcha", "turnstile"]),
+  captchaSiteKey: z.string().optional(),
+  captchaSecretKey: z.string().optional(),
+});
+
+export type SecuritySettingsInput = z.infer<typeof securitySettingsSchema>;
+
+// ============================================
+// NOTIFICATION SETTINGS
+// ============================================
+
+export const notificationSettingsSchema = z.object({
+  // Email notifications
+  emailOnNewUser: z.boolean(),
+  emailOnPasswordReset: z.boolean(),
+  emailOnLoginAlert: z.boolean(),
+  emailOnSystemAlert: z.boolean(),
+  // In-app notifications
+  enablePushNotifications: z.boolean(),
+  enableRealtimeUpdates: z.boolean(),
+  // Digest settings
+  enableDailyDigest: z.boolean(),
+  enableWeeklyReport: z.boolean(),
+  digestTime: z.string(),
+  adminEmails: z.array(z.string()),
+});
+
+export type NotificationSettingsInput = z.infer<
+  typeof notificationSettingsSchema
+>;
+
+// ============================================
+// SEO SETTINGS
+// ============================================
+
+export const seoSettingsSchema = z.object({
+  // Meta tags
+  defaultMetaTitle: z.string().optional(),
+  defaultMetaDescription: z.string().optional(),
+  metaKeywords: z.array(z.string()),
+  // Open Graph
+  ogImage: z.string().optional(),
+  ogSiteName: z.string().optional(),
+  // Twitter Card
+  twitterCardType: z.enum(["summary", "summary_large_image"]),
+  twitterSite: z.string().optional(),
+  // Analytics
+  googleAnalyticsId: z.string().optional(),
+  facebookPixelId: z.string().optional(),
+  // Robots
+  robotsTxt: z.string().optional(),
+  enableSitemap: z.boolean(),
+  enableIndexing: z.boolean(),
+});
+
+export type SeoSettingsInput = z.infer<typeof seoSettingsSchema>;
+
+// ============================================
+// LOCALIZATION SETTINGS
+// ============================================
+
+export const localizationSettingsSchema = z.object({
+  defaultLanguage: z.string(),
+  availableLanguages: z.array(z.string()),
+  autoDetectLanguage: z.boolean(),
+  defaultCurrency: z.string(),
+  currencySymbolPosition: z.enum(["before", "after"]),
+  numberFormat: z.enum(["1,234.56", "1.234,56", "1 234,56"]),
+  enableRtl: z.boolean(),
+});
+
+export type LocalizationSettingsInput = z.infer<
+  typeof localizationSettingsSchema
+>;
+
+// ============================================
+// BACKUP SETTINGS
+// ============================================
+
+export const backupSettingsSchema = z.object({
+  enableAutoBackup: z.boolean(),
+  backupFrequency: z.enum(["daily", "weekly", "monthly"]),
+  backupRetention: z.number().int().positive(), // number of backups to keep
+  backupTime: z.string(),
+  includeMedia: z.boolean(),
+  includeDatabase: z.boolean(),
+  storageLocation: z.enum(["local", "s3", "google-drive"]),
+});
+
+export type BackupSettingsInput = z.infer<typeof backupSettingsSchema>;
+
+// ============================================
+// QUERY SCHEMAS
+// ============================================
+
+export const getSettingsQuerySchema = z.object({
+  group: z.string().optional(),
+  key: z.string().optional(),
+  isPublic: z.coerce.boolean().optional(),
+});
+
+export type GetSettingsQuery = z.infer<typeof getSettingsQuerySchema>;
+
+// ============================================
+// UPDATE SCHEMAS
+// ============================================
+
+export const updateSettingSchema = z.object({
+  key: z.string(),
+  value: z.unknown(),
+});
+
+export const updateSettingsSchema = z.object({
+  settings: z.array(updateSettingSchema),
+});
+
+export type UpdateSettingInput = z.infer<typeof updateSettingSchema>;
+export type UpdateSettingsInput = z.infer<typeof updateSettingsSchema>;
+
+// ============================================
+// API RESPONSE TYPES
+// ============================================
+
+export interface SettingsGroupResponse {
+  group: string;
+  settings: Record<string, unknown>;
+}
+
+export interface SettingsListResponse {
+  data: SettingResponse[];
+}

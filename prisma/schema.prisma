@@ -182,3 +182,20 @@ model AuditLog {
   @@index([createdAt])
   @@index([status])
 }
+
+model Setting {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       Json
+  group       String // general, email, media, security, notification, seo, localization, backup
+  type        String // string, number, boolean, json, array
+  label       String? // Display label
+  description String? // Help text
+  isPublic    Boolean  @default(false) // Can be accessed without auth
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([group])
+  @@index([key])
+  @@index([isPublic])
+}
