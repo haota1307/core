@@ -158,13 +158,31 @@ export function BackupSettingsForm() {
     }
   };
 
-  const handleDownloadBackup = (id: string, filename: string) => {
-    const link = document.createElement("a");
-    link.href = `/api/backup/${id}`;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownloadBackup = async (id: string, filename: string) => {
+    try {
+      const { getAccessToken } = await import("@/lib/cookies");
+      const token = getAccessToken();
+
+      const response = await fetch(`/api/backup/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to download backup");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Download error:", error);
+    }
   };
 
   const handleDeleteBackup = (id: string) => {

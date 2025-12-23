@@ -3,6 +3,8 @@ import prisma from "@/lib/prisma";
 import { withPermission } from "@/lib/rbac";
 import { createAuditLog, AuditAction } from "@/lib/audit-log";
 import bcrypt from "bcryptjs";
+import fs from "fs/promises";
+import AdmZip from "adm-zip";
 
 /**
  * POST /api/backup/[id]/restore - Restore from a backup
@@ -26,7 +28,49 @@ export const POST = withPermission<Promise<{ id: string }>>(
         );
       }
 
-      const backupData = backup.data as Record<string, unknown>;
+      let backupData: Record<string, unknown>;
+
+      // Read backup data from ZIP file or database
+      if (backup.filePath) {
+        try {
+          // Read from ZIP file
+          const zip = new AdmZip(backup.filePath);
+          const zipEntries = zip.getEntries();
+
+          // Find JSON file in ZIP
+          const jsonEntry = zipEntries.find((entry) =>
+            entry.entryName.endsWith(".json")
+          );
+
+          if (!jsonEntry) {
+            return NextResponse.json(
+              {
+                code: "INVALID_BACKUP",
+                message: "No JSON data found in backup",
+              },
+              { status: 400 }
+            );
+          }
+
+          const jsonContent = jsonEntry.getData().toString("utf-8");
+          backupData = JSON.parse(jsonContent);
+        } catch (err) {
+          console.error("Error reading backup file:", err);
+          return NextResponse.json(
+            { code: "FILE_ERROR", message: "Failed to read backup file" },
+            { status: 500 }
+          );
+        }
+      } else if (backup.data) {
+        // Fallback for legacy backups stored in database
+        backupData = backup.data as Record<string, unknown>;
+      } else {
+        return NextResponse.json(
+          { code: "NO_DATA", message: "Backup has no data" },
+          { status: 400 }
+        );
+      }
+
       const results: Record<string, number> = {};
 
       // Restore settings

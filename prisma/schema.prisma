@@ -216,13 +216,14 @@ model LoginAttempt {
 model Backup {
   id              String   @id @default(cuid())
   filename        String
+  filePath        String? // Path to backup file on server
   size            Int // Size in bytes
   type            String // manual, scheduled
   status          String   @default("pending") // pending, completed, failed
   includeDatabase Boolean  @default(true)
   includeMedia    Boolean  @default(false)
   includeSettings Boolean  @default(true)
-  data            Json? // Backup data stored as JSON
+  data            Json? // Backup data stored as JSON (legacy, now stored in file)
   errorMessage    String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

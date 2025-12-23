@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { withPermission } from "@/lib/rbac";
 import { createAuditLog, AuditAction } from "@/lib/audit-log";
+import fs from "fs/promises";
+import path from "path";
+import archiver from "archiver";
+import { createWriteStream } from "fs";
+
+// Backup directory path
+const BACKUP_DIR = path.join(process.cwd(), "backups");
+
+// Ensure backup directory exists
+async function ensureBackupDir() {
+  try {
+    await fs.access(BACKUP_DIR);
+  } catch {
+    await fs.mkdir(BACKUP_DIR, { recursive: true });
+  }
+}
 
 /**
  * GET /api/backup - List all backups
@@ -13,6 +29,18 @@ export const GET = withPermission(
       const backups = await prisma.backup.findMany({
         orderBy: { createdAt: "desc" },
         take: 50,
+        select: {
+          id: true,
+          filename: true,
+          filePath: true,
+          size: true,
+          type: true,
+          status: true,
+          includeDatabase: true,
+          includeMedia: true,
+          includeSettings: true,
+          createdAt: true,
+        },
       });
 
       return NextResponse.json({ backups });
@@ -39,6 +67,9 @@ export const POST = withPermission(
         includeMedia = false,
         includeSettings = true,
       } = body;
+
+      // Ensure backup directory exists
+      await ensureBackupDir();
 
       // Get all data to backup
       const backupData: Record<string, unknown> = {
@@ -93,23 +124,43 @@ export const POST = withPermission(
 
       // Generate backup filename
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-      const filename = `backup-${timestamp}.json`;
+      const jsonFilename = `backup-${timestamp}.json`;
+      const zipFilename = `backup-${timestamp}.zip`;
+      const zipFilePath = path.join(BACKUP_DIR, zipFilename);
 
-      // Calculate size
-      const jsonString = JSON.stringify(backupData);
-      const sizeBytes = new TextEncoder().encode(jsonString).length;
+      // Create ZIP file with backup data
+      const sizeBytes = await new Promise<number>((resolve, reject) => {
+        const output = createWriteStream(zipFilePath);
+        const archive = archiver("zip", { zlib: { level: 9 } });
+
+        output.on("close", () => {
+          resolve(archive.pointer());
+        });
+
+        archive.on("error", (err) => {
+          reject(err);
+        });
+
+        archive.pipe(output);
+
+        // Add JSON data to the archive
+        const jsonString = JSON.stringify(backupData, null, 2);
+        archive.append(jsonString, { name: jsonFilename });
+
+        archive.finalize();
+      });
 
       // Save backup record to database
       const backup = await prisma.backup.create({
         data: {
-          filename,
+          filename: zipFilename,
+          filePath: zipFilePath,
           size: sizeBytes,
           type: "manual",
           status: "completed",
           includeDatabase,
           includeMedia,
           includeSettings,
-          data: JSON.parse(JSON.stringify(backupData)),
         },
       });
 
@@ -120,12 +171,13 @@ export const POST = withPermission(
           action: AuditAction.BACKUP_CREATE,
           entityType: "backup",
           entityId: backup.id,
-          entityName: filename,
+          entityName: zipFilename,
           metadata: {
             includeDatabase,
             includeMedia,
             includeSettings,
             size: sizeBytes,
+            filePath: zipFilePath,
           },
           status: "success",
         },
