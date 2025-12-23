@@ -3,6 +3,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
+import { http } from "@/lib/http";
+import { getAccessToken } from "@/lib/cookies";
 import {
   getSettingsByGroupAction,
   updateGeneralSettingsAction,
@@ -337,6 +339,181 @@ export function useTestEmailSettings() {
       } else {
         toast.error(result.error);
       }
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+// Backup types
+export interface Backup {
+  id: string;
+  filename: string;
+  size: number;
+  type: string;
+  status: string;
+  includeDatabase: boolean;
+  includeMedia: boolean;
+  includeSettings: boolean;
+  createdAt: string;
+}
+
+// Backup query keys
+export const backupKeys = {
+  all: ["backups"] as const,
+  list: () => [...backupKeys.all, "list"] as const,
+};
+
+/**
+ * Hook to list all backups
+ */
+export function useBackups() {
+  return useQuery({
+    queryKey: backupKeys.list(),
+    queryFn: async () => {
+      const data = await http.get<{ backups: Backup[] }>("/api/backup");
+      return data.backups;
+    },
+  });
+}
+
+/**
+ * Hook to create a backup
+ */
+export function useCreateBackup() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("settings.backup");
+
+  return useMutation({
+    mutationFn: async (options?: {
+      includeDatabase?: boolean;
+      includeMedia?: boolean;
+      includeSettings?: boolean;
+    }) => {
+      return http.post("/api/backup", options || {});
+    },
+    onSuccess: () => {
+      toast.success(t("backupCreated"));
+      queryClient.invalidateQueries({ queryKey: backupKeys.list() });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+/**
+ * Hook to delete a backup
+ */
+export function useDeleteBackup() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("settings.backup");
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return http.delete(`/api/backup/${id}`);
+    },
+    onSuccess: () => {
+      toast.success(t("backupDeleted"));
+      queryClient.invalidateQueries({ queryKey: backupKeys.list() });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+/**
+ * Hook to restore a backup
+ */
+export function useRestoreBackup() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("settings.backup");
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      options,
+    }: {
+      id: string;
+      options?: { restoreDatabase?: boolean; restoreSettings?: boolean };
+    }) => {
+      return http.post(`/api/backup/${id}/restore`, options || {});
+    },
+    onSuccess: () => {
+      toast.success(t("backupRestored"));
+      // Invalidate all settings queries after restore
+      queryClient.invalidateQueries({ queryKey: settingsKeys.all });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+/**
+ * Hook to export settings
+ */
+export function useExportSettings() {
+  const t = useTranslations("settings.backup");
+
+  return useMutation({
+    mutationFn: async () => {
+      // Need to use fetch for blob response, but with auth token
+      const token = getAccessToken();
+      const response = await fetch("/api/backup/export-settings", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!response.ok) {
+        throw new Error("Failed to export settings");
+      }
+      const blob = await response.blob();
+      const filename =
+        response.headers
+          .get("Content-Disposition")
+          ?.split("filename=")[1]
+          ?.replace(/"/g, "") || "settings.json";
+
+      // Trigger download
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    },
+    onSuccess: () => {
+      toast.success(t("settingsExported"));
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+/**
+ * Hook to import settings
+ */
+export function useImportSettings() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("settings.backup");
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      return http.post<{ importedCount: number }>(
+        "/api/backup/export-settings",
+        data
+      );
+    },
+    onSuccess: (data) => {
+      toast.success(t("settingsImported", { count: data.importedCount }));
+      queryClient.invalidateQueries({ queryKey: settingsKeys.all });
     },
     onError: (error: Error) => {
       toast.error(error.message);

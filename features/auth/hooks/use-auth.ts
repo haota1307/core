@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
+import { http } from "@/lib/http";
 import { loginAction, registerAction, logoutAction } from "../actions";
 import type { LoginInput, RegisterInput, PasswordPolicy } from "../schemas";
 import { toast } from "sonner";
@@ -16,11 +17,9 @@ export const usePasswordPolicy = () => {
   return useQuery<PasswordPolicy>({
     queryKey: ["password-policy"],
     queryFn: async () => {
-      const response = await fetch("/api/settings/password-policy");
-      if (!response.ok) {
-        throw new Error("Failed to fetch password policy");
-      }
-      return response.json();
+      return http.get<PasswordPolicy>("/api/settings/password-policy", {
+        auth: false,
+      });
     },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     gcTime: 10 * 60 * 1000,

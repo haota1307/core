@@ -28,6 +28,10 @@ const PERMISSIONS = [
   { code: "settings.view", desc: "Xem cài đặt hệ thống" },
   { code: "settings.edit", desc: "Chỉnh sửa cài đặt hệ thống" },
   { code: "settings.backup", desc: "Sao lưu & khôi phục dữ liệu" },
+  {
+    code: "settings:manage",
+    desc: "Quản lý cài đặt hệ thống (backup, restore)",
+  },
 ];
 
 // Roles với permissions
@@ -66,6 +70,7 @@ const ROLES = [
       "settings.view",
       "settings.edit",
       "settings.backup",
+      "settings:manage",
     ],
   },
   {

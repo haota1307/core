@@ -52,6 +52,14 @@ export enum AuditAction {
   // Settings actions
   SETTING_UPDATE = "setting.update",
   SETTING_VIEW = "setting.view",
+
+  // Backup actions
+  BACKUP_CREATE = "backup.create",
+  BACKUP_DELETE = "backup.delete",
+  BACKUP_RESTORE = "backup.restore",
+  BACKUP_DOWNLOAD = "backup.download",
+  SETTINGS_EXPORT = "settings.export",
+  SETTINGS_IMPORT = "settings.import",
 }
 
 /**

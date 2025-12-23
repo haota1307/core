@@ -212,3 +212,22 @@ model LoginAttempt {
   @@index([createdAt])
   @@index([email, createdAt])
 }
+
+model Backup {
+  id              String   @id @default(cuid())
+  filename        String
+  size            Int // Size in bytes
+  type            String // manual, scheduled
+  status          String   @default("pending") // pending, completed, failed
+  includeDatabase Boolean  @default(true)
+  includeMedia    Boolean  @default(false)
+  includeSettings Boolean  @default(true)
+  data            Json? // Backup data stored as JSON
+  errorMessage    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}

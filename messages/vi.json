@@ -1134,8 +1134,10 @@
       "exportSettings": "Xuất cài đặt",
       "importSettings": "Nhập cài đặt",
       "backupCreated": "Tạo bản sao lưu thành công",
+      "backupDeleted": "Xóa bản sao lưu thành công",
+      "backupRestored": "Khôi phục dữ liệu thành công",
       "settingsExported": "Xuất cài đặt thành công",
-      "settingsImported": "Nhập cài đặt thành công",
+      "settingsImported": "Nhập {count} cài đặt thành công",
       "autoBackup": "Sao lưu tự động",
       "autoBackupDescription": "Cấu hình sao lưu theo lịch",
       "enableAutoBackup": "Bật sao lưu tự động",
@@ -1154,7 +1156,20 @@
       "storageLocation": "Vị trí lưu trữ",
       "storageLocationDescription": "Nơi lưu trữ các tệp sao lưu",
       "location": "Vị trí",
-      "locationDescription": "Chọn nơi sao lưu sẽ được lưu"
+      "locationDescription": "Chọn nơi sao lưu sẽ được lưu",
+      "backupHistory": "Lịch sử sao lưu",
+      "backupHistoryDescription": "Xem và quản lý các bản sao lưu đã tạo",
+      "filename": "Tên tệp",
+      "size": "Kích thước",
+      "type": "Loại",
+      "status": "Trạng thái",
+      "createdAt": "Ngày tạo",
+      "actions": "Thao tác",
+      "download": "Tải xuống",
+      "restore": "Khôi phục",
+      "restoreTitle": "Khôi phục dữ liệu",
+      "restoreDescription": "Bạn có chắc chắn muốn khôi phục dữ liệu từ bản sao lưu này? Thao tác này sẽ ghi đè các cài đặt và dữ liệu hiện tại.",
+      "noBackups": "Chưa có bản sao lưu nào"
     }
   }
 }

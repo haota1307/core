@@ -1134,8 +1134,10 @@
       "exportSettings": "Export Settings",
       "importSettings": "Import Settings",
       "backupCreated": "Backup created successfully",
+      "backupDeleted": "Backup deleted successfully",
+      "backupRestored": "Data restored successfully",
       "settingsExported": "Settings exported successfully",
-      "settingsImported": "Settings imported successfully",
+      "settingsImported": "Successfully imported {count} settings",
       "autoBackup": "Automatic Backup",
       "autoBackupDescription": "Configure scheduled backups",
       "enableAutoBackup": "Enable Auto Backup",
@@ -1154,7 +1156,20 @@
       "storageLocation": "Storage Location",
       "storageLocationDescription": "Where to store backup files",
       "location": "Location",
-      "locationDescription": "Select where backups will be stored"
+      "locationDescription": "Select where backups will be stored",
+      "backupHistory": "Backup History",
+      "backupHistoryDescription": "View and manage created backups",
+      "filename": "Filename",
+      "size": "Size",
+      "type": "Type",
+      "status": "Status",
+      "createdAt": "Created At",
+      "actions": "Actions",
+      "download": "Download",
+      "restore": "Restore",
+      "restoreTitle": "Restore Data",
+      "restoreDescription": "Are you sure you want to restore data from this backup? This will overwrite current settings and data.",
+      "noBackups": "No backups yet"
     }
   }
 }

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { http } from "@/lib/http";
 
 export type ClientSiteSettings = {
   general: {
@@ -58,11 +59,12 @@ const SettingsContext = createContext<SettingsContextType>({
 });
 
 async function fetchPublicSettings(): Promise<ClientSiteSettings> {
-  const response = await fetch("/api/settings/public");
-  if (!response.ok) {
-    throw new Error("Failed to fetch settings");
-  }
-  const json = await response.json();
+  const json = await http.get<{ data: ClientSiteSettings }>(
+    "/api/settings/public",
+    {
+      auth: false,
+    }
+  );
   return {
     general: json.data?.general || {},
     seo: json.data?.seo || {},

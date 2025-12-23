@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,9 @@ import {
   Clock,
   HardDrive,
   Database,
+  Trash2,
+  RotateCcw,
+  FileJson,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,15 +45,29 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Spinner } from "@/components/ui/spinner";
+import { Badge } from "@/components/ui/badge";
 import { SettingsTabs, SettingsTabItem } from "./settings-tabs";
 import { backupSettingsSchema, BackupSettingsInput } from "../schemas";
 import {
   useBackupSettings,
   useUpdateBackupSettings,
+  useBackups,
+  useCreateBackup,
+  useDeleteBackup,
+  useRestoreBackup,
+  useExportSettings,
+  useImportSettings,
 } from "../hooks/use-settings";
 import { SettingsFormSkeleton } from "./settings-layout";
-import { toast } from "sonner";
 
 // Backup frequencies
 const backupFrequencies = [
@@ -105,19 +122,72 @@ export function BackupSettingsForm() {
     updateSettings(data);
   };
 
+  // Backup hooks
+  const { data: backups, isLoading: backupsLoading } = useBackups();
+  const createBackup = useCreateBackup();
+  const deleteBackup = useDeleteBackup();
+  const restoreBackup = useRestoreBackup();
+  const exportSettings = useExportSettings();
+  const importSettings = useImportSettings();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const [selectedBackupId, setSelectedBackupId] = useState<string | null>(null);
+
   const handleCreateBackup = () => {
-    // TODO: Implement backup creation
-    toast.success(t("backupCreated"));
+    createBackup.mutate({
+      includeDatabase: form.getValues("includeDatabase"),
+      includeMedia: form.getValues("includeMedia"),
+      includeSettings: true,
+    });
   };
 
   const handleExportSettings = () => {
-    // TODO: Implement settings export
-    toast.success(t("settingsExported"));
+    exportSettings.mutate();
   };
 
   const handleImportSettings = () => {
-    // TODO: Implement settings import
-    toast.success(t("settingsImported"));
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      importSettings.mutate(file);
+      e.target.value = "";
+    }
+  };
+
+  const handleDownloadBackup = (id: string, filename: string) => {
+    const link = document.createElement("a");
+    link.href = `/api/backup/${id}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleDeleteBackup = (id: string) => {
+    deleteBackup.mutate(id);
+  };
+
+  const handleRestoreBackup = (id: string) => {
+    setSelectedBackupId(id);
+    setRestoreDialogOpen(true);
+  };
+
+  const confirmRestore = () => {
+    if (selectedBackupId) {
+      restoreBackup.mutate({ id: selectedBackupId });
+      setRestoreDialogOpen(false);
+      setSelectedBackupId(null);
+    }
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
   if (isLoading) {
@@ -158,15 +228,38 @@ export function BackupSettingsForm() {
               </AlertDialogContent>
             </AlertDialog>
 
-            <Button variant="outline" onClick={handleExportSettings}>
-              <Download className="mr-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              onClick={handleExportSettings}
+              disabled={exportSettings.isPending}
+            >
+              {exportSettings.isPending ? (
+                <Spinner className="mr-2 h-4 w-4" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
               {t("exportSettings")}
             </Button>
 
-            <Button variant="outline" onClick={handleImportSettings}>
-              <Upload className="mr-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              onClick={handleImportSettings}
+              disabled={importSettings.isPending}
+            >
+              {importSettings.isPending ? (
+                <Spinner className="mr-2 h-4 w-4" />
+              ) : (
+                <Upload className="mr-2 h-4 w-4" />
+              )}
               {t("importSettings")}
             </Button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept=".json"
+              className="hidden"
+            />
           </div>
 
           <FormField
@@ -360,6 +453,120 @@ export function BackupSettingsForm() {
               </FormItem>
             )}
           />
+        </div>
+      ),
+    },
+    {
+      id: "history",
+      title: t("backupHistory"),
+      description: t("backupHistoryDescription"),
+      icon: FileJson,
+      content: (
+        <div className="space-y-4">
+          {backupsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Spinner className="h-6 w-6" />
+            </div>
+          ) : backups && backups.length > 0 ? (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t("filename")}</TableHead>
+                    <TableHead>{t("size")}</TableHead>
+                    <TableHead>{t("type")}</TableHead>
+                    <TableHead>{t("status")}</TableHead>
+                    <TableHead>{t("createdAt")}</TableHead>
+                    <TableHead className="text-right">{t("actions")}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {backups.map((backup) => (
+                    <TableRow key={backup.id}>
+                      <TableCell className="font-mono text-sm">
+                        {backup.filename}
+                      </TableCell>
+                      <TableCell>{formatFileSize(backup.size)}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{backup.type}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            backup.status === "completed"
+                              ? "default"
+                              : backup.status === "failed"
+                              ? "destructive"
+                              : "secondary"
+                          }
+                        >
+                          {backup.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(backup.createdAt).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() =>
+                              handleDownloadBackup(backup.id, backup.filename)
+                            }
+                            title={t("download")}
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleRestoreBackup(backup.id)}
+                            title={t("restore")}
+                          >
+                            <RotateCcw className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteBackup(backup.id)}
+                            title={tCommon("delete")}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              {t("noBackups")}
+            </div>
+          )}
+
+          {/* Restore confirmation dialog */}
+          <AlertDialog
+            open={restoreDialogOpen}
+            onOpenChange={setRestoreDialogOpen}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("restoreTitle")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("restoreDescription")}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{tCommon("cancel")}</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmRestore}>
+                  {t("restore")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       ),
     },
