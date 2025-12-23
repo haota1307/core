@@ -1,19 +1,13 @@
-import { GalleryVerticalEnd } from "lucide-react";
+import { Building2 } from "lucide-react";
 import React from "react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { ModeToggle } from "@/components/mode-toggle";
 import Link from "next/link";
-import { useIsLoggedIn } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { getSiteSettings } from "@/lib/settings";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
-  const isLoggedIn = useIsLoggedIn();
-
-  console.log(isLoggedIn);
-
-  if (isLoggedIn) {
-    redirect("/");
-  }
+const Layout = async ({ children }: { children: React.ReactNode }) => {
+  const siteSettings = await getSiteSettings();
+  const siteName = siteSettings.general.siteName || "My App";
 
   return (
     <div className="bg-muted flex h-screen flex-col items-center justify-center gap-6 p-6 md:p-10">
@@ -24,9 +18,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             className="flex items-center gap-2 self-center font-medium"
           >
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-              <GalleryVerticalEnd className="size-4" />
+              <Building2 className="size-4" />
             </div>
-            Acme Inc.
+            {siteName}
           </Link>
         </div>
         {children}

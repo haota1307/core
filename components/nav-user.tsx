@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { BadgeCheck, Bell, ChevronsUpDown, LogOut, User } from "lucide-react";
+import {
+  BadgeCheck,
+  Bell,
+  ChevronsUpDown,
+  LogOut,
+  Shield,
+  User,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -22,6 +29,7 @@ import {
 } from "@/components/ui/sidebar";
 import { UserProfileDialog } from "@/features/user/components/user-profile-dialog";
 import { useLogout } from "@/features/auth/hooks/use-auth";
+import { Link } from "@/i18n/routing";
 import type { UserResponse } from "@/features/user/schemas";
 
 export function NavUser({ user }: { user: UserResponse }) {
@@ -106,9 +114,11 @@ export function NavUser({ user }: { user: UserResponse }) {
                   <User />
                   {t("profile")}
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <BadgeCheck />
-                  {t("account")}
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard/account">
+                    <Shield />
+                    {t("account")}
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Bell />

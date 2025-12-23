@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { AudioWaveform, Command, GalleryVerticalEnd } from "lucide-react";
+import { Building2 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
@@ -17,35 +17,31 @@ import {
 } from "@/components/ui/sidebar";
 import { buildNavigationData } from "@/lib/navigation";
 import { useCurrentUser } from "@/features/user/hooks/use-current-user";
+import { useSettings } from "@/lib/settings-context";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const teams = [
-  {
-    name: "Acme Inc",
-    logo: GalleryVerticalEnd,
-    plan: "Enterprise",
-  },
-  {
-    name: "Acme Corp.",
-    logo: AudioWaveform,
-    plan: "Startup",
-  },
-  {
-    name: "Evil Corp.",
-    logo: Command,
-    plan: "Free",
-  },
-];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const tNavItems = useTranslations("nav.items");
   const { navMain, quickLinks } = buildNavigationData(tNavItems);
   const { data: currentUserData, isLoading } = useCurrentUser();
+  const { settings } = useSettings();
+
+  // Build team/site info from settings
+  const siteInfo = React.useMemo(
+    () => [
+      {
+        name: settings.general.siteName || "My App",
+        logo: Building2,
+        plan: settings.general.siteDescription || "Dashboard",
+      },
+    ],
+    [settings.general.siteName, settings.general.siteDescription]
+  );
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={teams} />
+        <TeamSwitcher teams={siteInfo} />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMain} />

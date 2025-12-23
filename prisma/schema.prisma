@@ -199,3 +199,16 @@ model Setting {
   @@index([key])
   @@index([isPublic])
 }
+
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  email     String
+  ipAddress String?
+  success   Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([ipAddress])
+  @@index([createdAt])
+  @@index([email, createdAt])
+}

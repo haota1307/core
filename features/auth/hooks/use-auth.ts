@@ -1,13 +1,31 @@
 "use client";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { loginAction, registerAction, logoutAction } from "../actions";
-import type { LoginInput, RegisterInput } from "../schemas";
+import type { LoginInput, RegisterInput, PasswordPolicy } from "../schemas";
 import { toast } from "sonner";
 import { storeTokens, clearTokens } from "@/lib/cookies";
 import { clearPermissionsCache } from "@/lib/hooks/use-permissions";
+
+/**
+ * Hook to fetch password policy from server
+ */
+export const usePasswordPolicy = () => {
+  return useQuery<PasswordPolicy>({
+    queryKey: ["password-policy"],
+    queryFn: async () => {
+      const response = await fetch("/api/settings/password-policy");
+      if (!response.ok) {
+        throw new Error("Failed to fetch password policy");
+      }
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    gcTime: 10 * 60 * 1000,
+  });
+};
 
 export const useLogin = () => {
   const router = useRouter();

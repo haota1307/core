@@ -8,10 +8,18 @@ const protectedRoutes = ["/dashboard"];
 // Routes that should redirect to dashboard if already authenticated
 const authRoutes = ["/auth/login", "/auth/register"];
 
+// Routes that are exempt from maintenance mode
+const maintenanceExemptRoutes = [
+  "/maintenance",
+  "/auth/login",
+  "/auth/register",
+  "/api",
+];
+
 // Create the i18n middleware
 const intlMiddleware = createMiddleware(routing);
 
-export default function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const method = request.method;
 
@@ -23,6 +31,41 @@ export default function middleware(request: NextRequest) {
     // Get access token from cookies
     const accessToken = request.cookies.get("accessToken")?.value;
     const isAuthenticated = !!accessToken;
+
+    // Check if the current path is exempt from maintenance mode
+    const isExemptFromMaintenance = maintenanceExemptRoutes.some((route) =>
+      pathname.includes(route)
+    );
+
+    // Check maintenance mode (only for non-authenticated users and non-exempt routes)
+    if (!isAuthenticated && !isExemptFromMaintenance) {
+      try {
+        // Check maintenance mode via internal API
+        const baseUrl = request.nextUrl.origin;
+        const maintenanceRes = await fetch(
+          `${baseUrl}/api/settings/maintenance`,
+          {
+            cache: "no-store",
+          }
+        );
+
+        if (maintenanceRes.ok) {
+          const { maintenanceMode } = await maintenanceRes.json();
+
+          if (maintenanceMode) {
+            const locale = pathname.split("/")[1] || routing.defaultLocale;
+            const maintenanceUrl = new URL(
+              `/${locale}/maintenance`,
+              request.url
+            );
+            return NextResponse.redirect(maintenanceUrl);
+          }
+        }
+      } catch (error) {
+        // If check fails, continue normally
+        console.error("Maintenance check failed:", error);
+      }
+    }
 
     // Check if the current path (without locale) is protected
     const isProtectedRoute = protectedRoutes.some((route) =>

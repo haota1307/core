@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ReactQueryProvider } from "@/lib/query-client";
+import { SettingsProvider } from "@/lib/settings-context";
+import { getSiteSettings } from "@/lib/settings";
 import "../globals.css";
 import { Toaster } from "sonner";
 
@@ -29,14 +31,31 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  const siteSettings = await getSiteSettings();
 
   // You can load translations here for metadata
   const messages = await getMessages({ locale });
   const metadata = messages.metadata as any;
 
+  // Use site settings if available, otherwise fall back to translations
+  const siteName =
+    siteSettings.general.siteName || metadata?.title || "Next.js App";
+  const siteDescription =
+    siteSettings.general.siteDescription ||
+    metadata?.description ||
+    "A modern Next.js application";
+
   return {
-    title: metadata?.title || "Next.js App",
-    description: metadata?.description || "A modern Next.js application",
+    title: {
+      default: siteName,
+      template: `%s | ${siteName}`,
+    },
+    description: siteDescription,
+    icons: siteSettings.general.favicon
+      ? {
+          icon: siteSettings.general.favicon,
+        }
+      : undefined,
     alternates: {
       canonical: `/${locale}`,
       languages: {
@@ -45,6 +64,8 @@ export async function generateMetadata({
       },
     },
     openGraph: {
+      siteName,
+      description: siteDescription,
       locale: locale,
       type: "website",
     },
@@ -69,6 +90,9 @@ export default async function LocaleLayout({
   // side is the easiest way to get started
   const messages = await getMessages();
 
+  // Fetch site settings for client-side use
+  const siteSettings = await getSiteSettings();
+
   return (
     <html lang={locale} suppressHydrationWarning>
       <body
@@ -81,8 +105,10 @@ export default async function LocaleLayout({
             disableTransitionOnChange
           >
             <ReactQueryProvider>
-              <Toaster />
-              {children}
+              <SettingsProvider initialSettings={siteSettings}>
+                <Toaster />
+                {children}
+              </SettingsProvider>
             </ReactQueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "@/lib/prisma";
 import { createAuditLog, AuditAction } from "@/lib/audit-log";
+import { getSecuritySettings, validatePasswordPolicy } from "@/lib/settings";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const JWT_REFRESH_SECRET =
@@ -19,6 +20,24 @@ export async function POST(request: NextRequest) {
         {
           code: "MISSING_FIELDS",
           message: "Name, email and password are required",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Get security settings and validate password
+    const securitySettings = await getSecuritySettings();
+    const passwordValidation = validatePasswordPolicy(
+      password,
+      securitySettings
+    );
+
+    if (!passwordValidation.valid) {
+      return NextResponse.json(
+        {
+          code: "INVALID_PASSWORD",
+          message: passwordValidation.errors[0],
+          errors: passwordValidation.errors,
         },
         { status: 400 }
       );

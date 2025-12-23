@@ -39,6 +39,44 @@ function getValueType(value: unknown): string {
   return typeMap[typeof value] || "string";
 }
 
+// Define which settings should be publicly accessible (no auth required)
+const publicSettings: Record<string, string[]> = {
+  [SettingGroup.GENERAL]: [
+    "siteName",
+    "siteDescription",
+    "siteLogo",
+    "favicon",
+    "contactEmail",
+    "contactPhone",
+    "address",
+    "timezone",
+    "dateFormat",
+    "maintenanceMode",
+  ],
+  [SettingGroup.SEO]: [
+    "defaultMetaTitle",
+    "defaultMetaDescription",
+    "defaultMetaKeywords",
+    "googleAnalyticsId",
+    "googleTagManagerId",
+    "facebookPixelId",
+    "enableSitemap",
+  ],
+  [SettingGroup.LOCALIZATION]: [
+    "defaultLocale",
+    "availableLocales",
+    "currencyCode",
+    "currencySymbol",
+    "currencyPosition",
+    "thousandSeparator",
+    "decimalSeparator",
+  ],
+};
+
+function isPublicSetting(group: string, key: string): boolean {
+  return publicSettings[group]?.includes(key) ?? false;
+}
+
 type Params = Promise<{ group: string }>;
 
 /**
@@ -133,10 +171,12 @@ export const PUT = withPermission(
             value: value as any,
             group,
             type: getValueType(value),
+            isPublic: isPublicSetting(group, key),
           },
           update: {
             value: value as any,
             type: getValueType(value),
+            isPublic: isPublicSetting(group, key),
           },
         })
       );

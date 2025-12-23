@@ -63,8 +63,8 @@ export async function POST(request: NextRequest) {
       { expiresIn: "7d" }
     );
 
-    // Delete old refresh token and create new one
-    await prisma.refreshToken.delete({
+    // Delete old refresh token and create new one (use deleteMany to avoid error if not found)
+    await prisma.refreshToken.deleteMany({
       where: { id: storedToken.id },
     });
 

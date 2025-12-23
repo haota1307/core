@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ import { LocaleLink } from "@/components/locale-link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createAuthSchemas, type RegisterInput } from "../schemas";
-import { useRegister } from "../hooks/use-auth";
+import { useRegister, usePasswordPolicy } from "../hooks/use-auth";
 
 export function RegisterForm({
   className,
@@ -31,7 +32,47 @@ export function RegisterForm({
   const tCommon = useTranslations("common");
   const tAll = useTranslations();
 
-  const { registerSchema } = createAuthSchemas((key: string) => tAll(key));
+  const { data: passwordPolicy, isLoading: policyLoading } =
+    usePasswordPolicy();
+
+  const { registerSchema, passwordRequirements } = useMemo(() => {
+    const schemas = createAuthSchemas(
+      (key: string) => tAll(key),
+      passwordPolicy
+    );
+
+    // Build password requirements text
+    const requirements: string[] = [];
+    if (passwordPolicy) {
+      requirements.push(
+        tAll("auth.validation.passwordMinLengthHint", {
+          count: passwordPolicy.passwordMinLength,
+        })
+      );
+      if (passwordPolicy.passwordRequireUppercase) {
+        requirements.push(tAll("auth.validation.requireUppercaseHint"));
+      }
+      if (passwordPolicy.passwordRequireLowercase) {
+        requirements.push(tAll("auth.validation.requireLowercaseHint"));
+      }
+      if (passwordPolicy.passwordRequireNumber) {
+        requirements.push(tAll("auth.validation.requireNumberHint"));
+      }
+      if (passwordPolicy.passwordRequireSpecial) {
+        requirements.push(tAll("auth.validation.requireSpecialHint"));
+      }
+    } else {
+      requirements.push(
+        tAll("auth.validation.passwordMinLengthHint", { count: 8 })
+      );
+    }
+
+    return {
+      registerSchema: schemas.registerSchema,
+      passwordRequirements: requirements.join(", "),
+    };
+  }, [passwordPolicy, tAll]);
+
   const registerMutation = useRegister();
 
   const {
@@ -119,12 +160,13 @@ export function RegisterForm({
                     )}
                   </Field>
                 </Field>
-                <FieldDescription>
-                  Must be at least 8 characters long.
-                </FieldDescription>
+                <FieldDescription>{passwordRequirements}</FieldDescription>
               </Field>
               <Field>
-                <Button type="submit" disabled={registerMutation.isPending}>
+                <Button
+                  type="submit"
+                  disabled={registerMutation.isPending || policyLoading}
+                >
                   {registerMutation.isPending
                     ? tCommon("loading")
                     : tCommon("register")}
