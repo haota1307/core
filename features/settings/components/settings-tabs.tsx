@@ -99,20 +99,29 @@ export function SettingsTabs({
 
         {/* Main Content */}
         <div className="flex-1 min-w-0">
-          {activeTabData && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  {activeTabData.icon && (
-                    <activeTabData.icon className="h-5 w-5" />
-                  )}
-                  {activeTabData.title}
-                </CardTitle>
-                <CardDescription>{activeTabData.description}</CardDescription>
-              </CardHeader>
-              <CardContent>{activeTabData.content}</CardContent>
-            </Card>
-          )}
+          {/* Render all tabs but only show the active one - keeps form state intact */}
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+
+            return (
+              <div
+                key={tab.id}
+                className={cn(isActive ? "block" : "hidden")}
+              >
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      {Icon && <Icon className="h-5 w-5" />}
+                      {tab.title}
+                    </CardTitle>
+                    <CardDescription>{tab.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>{tab.content}</CardContent>
+                </Card>
+              </div>
+            );
+          })}
 
           {/* Footer (e.g., Save button) */}
           {footer && <div className="mt-6">{footer}</div>}

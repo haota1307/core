@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withPermission } from "@/lib/rbac";
 import { createAuditLog, AuditAction } from "@/lib/audit-log";
+import { sendTestEmail } from "@/lib/email";
 
 /**
  * POST /api/settings/email/test
@@ -20,15 +21,8 @@ export const POST = withPermission(
         );
       }
 
-      // TODO: Implement actual email sending logic
-      // This would use the configured SMTP settings to send a test email
-      // For now, we'll just simulate the action
-
-      // In a real implementation:
-      // 1. Fetch email settings from database
-      // 2. Create nodemailer transport with those settings
-      // 3. Send test email
-      // 4. Return success/failure
+      // Send test email using configured SMTP settings
+      await sendTestEmail(email);
 
       // Audit log
       await createAuditLog(

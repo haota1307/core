@@ -16,6 +16,11 @@ import {
   updateLocalizationSettingsAction,
   updateBackupSettingsAction,
   testEmailSettingsAction,
+  getEmailTemplatesAction,
+  getEmailTemplateAction,
+  createEmailTemplateAction,
+  updateEmailTemplateAction,
+  deleteEmailTemplateAction,
 } from "../actions";
 import {
   SettingGroup,
@@ -27,6 +32,9 @@ import {
   SeoSettingsInput,
   LocalizationSettingsInput,
   BackupSettingsInput,
+  GetEmailTemplatesQuery,
+  CreateEmailTemplateInput,
+  UpdateEmailTemplateInput,
 } from "../schemas";
 
 // Query keys
@@ -514,6 +522,133 @@ export function useImportSettings() {
     onSuccess: (data) => {
       toast.success(t("settingsImported", { count: data.importedCount }));
       queryClient.invalidateQueries({ queryKey: settingsKeys.all });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+// ============================================
+// EMAIL TEMPLATE HOOKS
+// ============================================
+
+// Email template query keys
+export const emailTemplateKeys = {
+  all: ["emailTemplates"] as const,
+  lists: () => [...emailTemplateKeys.all, "list"] as const,
+  list: (query: GetEmailTemplatesQuery) => [...emailTemplateKeys.lists(), query] as const,
+  details: () => [...emailTemplateKeys.all, "detail"] as const,
+  detail: (id: string) => [...emailTemplateKeys.details(), id] as const,
+};
+
+/**
+ * Hook to get email templates list
+ */
+export function useEmailTemplates(
+  query: GetEmailTemplatesQuery,
+  options?: { enabled?: boolean }
+) {
+  return useQuery({
+    queryKey: emailTemplateKeys.list(query),
+    queryFn: async () => {
+      const result = await getEmailTemplatesAction(query);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      return result.data;
+    },
+    staleTime: 30 * 1000,
+    enabled: options?.enabled ?? true,
+  });
+}
+
+/**
+ * Hook to get single email template
+ */
+export function useEmailTemplate(id: string) {
+  return useQuery({
+    queryKey: emailTemplateKeys.detail(id),
+    queryFn: async () => {
+      const result = await getEmailTemplateAction(id);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      return result.data;
+    },
+    enabled: !!id,
+  });
+}
+
+/**
+ * Hook to create email template
+ */
+export function useCreateEmailTemplate() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("settings.email.templates");
+
+  return useMutation({
+    mutationFn: async (input: CreateEmailTemplateInput) => {
+      const result = await createEmailTemplateAction(input);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: emailTemplateKeys.lists() });
+      toast.success(t("createSuccess"));
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+/**
+ * Hook to update email template
+ */
+export function useUpdateEmailTemplate(id: string) {
+  const queryClient = useQueryClient();
+  const t = useTranslations("settings.email.templates");
+
+  return useMutation({
+    mutationFn: async (input: UpdateEmailTemplateInput) => {
+      const result = await updateEmailTemplateAction(id, input);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: emailTemplateKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: emailTemplateKeys.detail(id) });
+      toast.success(t("updateSuccess"));
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+/**
+ * Hook to delete email template
+ */
+export function useDeleteEmailTemplate() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("settings.email.templates");
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const result = await deleteEmailTemplateAction(id);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: emailTemplateKeys.lists() });
+      toast.success(t("deleteSuccess"));
     },
     onError: (error: Error) => {
       toast.error(error.message);

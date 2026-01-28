@@ -74,7 +74,6 @@ export type GeneralSettingsInput = z.infer<typeof generalSettingsSchema>;
 // ============================================
 
 export const emailSettingsSchema = z.object({
-  smtpProvider: z.enum(["custom", "gmail", "sendgrid", "mailgun", "ses"]),
   smtpHost: z.string().optional(),
   smtpPort: z.number().int().positive(),
   smtpSecure: z.boolean(),
@@ -89,6 +88,76 @@ export const emailSettingsSchema = z.object({
 });
 
 export type EmailSettingsInput = z.infer<typeof emailSettingsSchema>;
+
+// ============================================
+// EMAIL TEMPLATES
+// ============================================
+
+export const emailTemplateVariableSchema = z.object({
+  key: z.string(),
+  description: z.string(),
+});
+
+export const createEmailTemplateSchema = z.object({
+  slug: z
+    .string()
+    .min(1, "Slug is required")
+    .regex(/^[a-z0-9-]+$/, "Slug must be lowercase letters, numbers, and hyphens only"),
+  name: z.string().min(1, "Template name is required"),
+  subject: z.string().min(1, "Subject is required"),
+  body: z.string().min(1, "Body is required"),
+  bodyType: z.enum(["html", "markdown"]),
+  description: z.string(),
+  variables: z.array(emailTemplateVariableSchema),
+  isActive: z.boolean(),
+});
+
+export const updateEmailTemplateSchema = z.object({
+  name: z.string().min(1, "Template name is required").optional(),
+  subject: z.string().min(1, "Subject is required").optional(),
+  body: z.string().min(1, "Body is required").optional(),
+  bodyType: z.enum(["html", "markdown"]).optional(),
+  description: z.string().optional(),
+  variables: z.array(emailTemplateVariableSchema).optional(),
+  isActive: z.boolean().optional(),
+});
+
+export const getEmailTemplatesQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(10),
+  search: z.string().optional(),
+  isActive: z.coerce.boolean().optional(),
+});
+
+export type EmailTemplateVariable = z.infer<typeof emailTemplateVariableSchema>;
+export type CreateEmailTemplateInput = z.infer<typeof createEmailTemplateSchema>;
+export type UpdateEmailTemplateInput = z.infer<typeof updateEmailTemplateSchema>;
+export type GetEmailTemplatesQuery = z.infer<typeof getEmailTemplatesQuerySchema>;
+
+export interface EmailTemplateResponse {
+  id: string;
+  slug: string;
+  name: string;
+  subject: string;
+  body: string;
+  bodyType: string;
+  description: string | null;
+  variables: EmailTemplateVariable[] | null;
+  isSystem: boolean;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface EmailTemplateListResponse {
+  data: EmailTemplateResponse[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
 
 // ============================================
 // MEDIA SETTINGS

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
-import { Eye, EyeOff, Send, Server, Settings, Mail } from "lucide-react";
+import { Eye, EyeOff, Send, Server, Mail, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -17,13 +17,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -42,25 +35,7 @@ import {
   useTestEmailSettings,
 } from "../hooks/use-settings";
 import { SettingsFormSkeleton } from "./settings-layout";
-
-// SMTP Provider configurations
-const smtpProviders = [
-  { value: "custom", label: "Custom SMTP", host: "", port: 587 },
-  { value: "gmail", label: "Gmail", host: "smtp.gmail.com", port: 587 },
-  {
-    value: "sendgrid",
-    label: "SendGrid",
-    host: "smtp.sendgrid.net",
-    port: 587,
-  },
-  { value: "mailgun", label: "Mailgun", host: "smtp.mailgun.org", port: 587 },
-  {
-    value: "ses",
-    label: "Amazon SES",
-    host: "email-smtp.us-east-1.amazonaws.com",
-    port: 587,
-  },
-];
+import { EmailTemplateList } from "./email-template-list";
 
 export function EmailSettingsForm() {
   const t = useTranslations("settings.email");
@@ -76,9 +51,9 @@ export function EmailSettingsForm() {
   const [testDialogOpen, setTestDialogOpen] = useState(false);
 
   const form = useForm<EmailSettingsInput>({
-    resolver: zodResolver(emailSettingsSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(emailSettingsSchema) as any,
     defaultValues: {
-      smtpProvider: "custom",
       smtpHost: "",
       smtpPort: 587,
       smtpSecure: true,
@@ -89,11 +64,10 @@ export function EmailSettingsForm() {
     },
   });
 
-  // Update form when settings are loaded
+  // Update form when settings are loaded (only once when settings change)
   useEffect(() => {
     if (settings) {
       form.reset({
-        smtpProvider: settings.smtpProvider || "custom",
         smtpHost: settings.smtpHost || "",
         smtpPort: settings.smtpPort || 587,
         smtpSecure: settings.smtpSecure ?? true,
@@ -103,20 +77,17 @@ export function EmailSettingsForm() {
         fromEmail: settings.fromEmail || "",
       });
     }
-  }, [settings, form]);
-
-  // Auto-fill host/port when provider changes
-  const handleProviderChange = (value: string) => {
-    form.setValue("smtpProvider", value as any);
-    const provider = smtpProviders.find((p) => p.value === value);
-    if (provider && provider.host) {
-      form.setValue("smtpHost", provider.host);
-      form.setValue("smtpPort", provider.port);
-    }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
 
   const onSubmit = (data: EmailSettingsInput) => {
-    updateSettings(data);
+    // Ensure correct types before submission
+    const payload = {
+      ...data,
+      smtpPort: Number(data.smtpPort) || 587,
+      smtpSecure: Boolean(data.smtpSecure),
+    };
+    updateSettings(payload);
   };
 
   const handleTestEmail = () => {
@@ -133,41 +104,12 @@ export function EmailSettingsForm() {
 
   const tabs: SettingsTabItem[] = [
     {
-      id: "smtp-provider",
+      id: "smtp-config",
       title: t("smtpConfig"),
       description: t("smtpConfigDescription"),
       icon: Server,
       content: (
         <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="smtpProvider"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("provider")}</FormLabel>
-                <Select
-                  onValueChange={handleProviderChange}
-                  value={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder={t("providerPlaceholder")} />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {smtpProviders.map((provider) => (
-                      <SelectItem key={provider.value} value={provider.value}>
-                        {provider.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormDescription>{t("providerDescription")}</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           <div className="grid gap-4 sm:grid-cols-2">
             <FormField
               control={form.control}
@@ -176,8 +118,9 @@ export function EmailSettingsForm() {
                 <FormItem>
                   <FormLabel>{t("host")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("hostPlaceholder")} {...field} />
+                    <Input placeholder={t("hostPlaceholder")} {...field} value={field.value ?? ""} />
                   </FormControl>
+                  <FormDescription>{t("hostDescription")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -194,11 +137,13 @@ export function EmailSettingsForm() {
                       type="number"
                       placeholder="587"
                       {...field}
+                      value={field.value ?? 587}
                       onChange={(e) =>
                         field.onChange(parseInt(e.target.value) || 587)
                       }
                     />
                   </FormControl>
+                  <FormDescription>{t("portDescription")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -223,16 +168,7 @@ export function EmailSettingsForm() {
               </FormItem>
             )}
           />
-        </div>
-      ),
-    },
-    {
-      id: "smtp-authentication",
-      title: t("authentication"),
-      description: t("authenticationDescription"),
-      icon: Settings,
-      content: (
-        <div className="space-y-4">
+
           <FormField
             control={form.control}
             name="smtpUsername"
@@ -240,7 +176,7 @@ export function EmailSettingsForm() {
               <FormItem>
                 <FormLabel>{t("username")}</FormLabel>
                 <FormControl>
-                  <Input placeholder={t("usernamePlaceholder")} {...field} />
+                  <Input placeholder={t("usernamePlaceholder")} {...field} value={field.value ?? ""} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -259,6 +195,7 @@ export function EmailSettingsForm() {
                       type={showPassword ? "text" : "password"}
                       placeholder={t("passwordPlaceholder")}
                       {...field}
+                      value={field.value ?? ""}
                     />
                     <Button
                       type="button"
@@ -298,8 +235,9 @@ export function EmailSettingsForm() {
                 <FormItem>
                   <FormLabel>{t("fromName")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={t("fromNamePlaceholder")} {...field} />
+                    <Input placeholder={t("fromNamePlaceholder")} {...field} value={field.value ?? ""} />
                   </FormControl>
+                  <FormDescription>{t("fromNameDescription")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -316,8 +254,10 @@ export function EmailSettingsForm() {
                       type="email"
                       placeholder={t("fromEmailPlaceholder")}
                       {...field}
+                      value={field.value ?? ""}
                     />
                   </FormControl>
+                  <FormDescription>{t("fromEmailDescription")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -326,6 +266,13 @@ export function EmailSettingsForm() {
         </div>
       ),
     },
+    {
+      id: "email-templates",
+      title: t("templates.tabTitle"),
+      description: t("templates.tabDescription"),
+      icon: FileText,
+      content: <EmailTemplateList />,
+    },
   ];
 
   return (
@@ -333,7 +280,7 @@ export function EmailSettingsForm() {
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <SettingsTabs
           tabs={tabs}
-          defaultTab="smtp-provider"
+          defaultTab="smtp-config"
           title={t("title")}
           description={t("description")}
           footer={

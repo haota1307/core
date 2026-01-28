@@ -12,3 +12,7 @@ export { NotificationSettingsForm } from "./notification-settings-form";
 export { SeoSettingsForm } from "./seo-settings-form";
 export { LocalizationSettingsForm } from "./localization-settings-form";
 export { BackupSettingsForm } from "./backup-settings-form";
+
+// Email template components
+export { EmailTemplateDialog } from "./email-template-dialog";
+export { EmailTemplateList } from "./email-template-list";

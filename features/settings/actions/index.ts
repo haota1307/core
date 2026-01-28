@@ -221,3 +221,108 @@ export async function testEmailSettingsAction(email: string) {
     };
   }
 }
+
+// ============================================
+// EMAIL TEMPLATE ACTIONS
+// ============================================
+
+import {
+  CreateEmailTemplateInput,
+  UpdateEmailTemplateInput,
+  GetEmailTemplatesQuery,
+  EmailTemplateListResponse,
+  EmailTemplateResponse,
+} from "../schemas";
+
+/**
+ * Get email templates list
+ */
+export async function getEmailTemplatesAction(query: GetEmailTemplatesQuery) {
+  try {
+    const params = new URLSearchParams();
+    params.append("page", query.page.toString());
+    params.append("limit", query.limit.toString());
+    if (query.search) params.append("search", query.search);
+    if (query.isActive !== undefined) params.append("isActive", String(query.isActive));
+
+    const response = await http.get<EmailTemplateListResponse>(
+      `/api/settings/email/templates?${params.toString()}`
+    );
+    return { success: true, data: response };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Failed to fetch email templates",
+    };
+  }
+}
+
+/**
+ * Get single email template
+ */
+export async function getEmailTemplateAction(id: string) {
+  try {
+    const response = await http.get<{ data: EmailTemplateResponse }>(
+      `/api/settings/email/templates/${id}`
+    );
+    return { success: true, data: response.data };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Failed to fetch email template",
+    };
+  }
+}
+
+/**
+ * Create email template
+ */
+export async function createEmailTemplateAction(input: CreateEmailTemplateInput) {
+  try {
+    const response = await http.post<{ data: EmailTemplateResponse; message: string }>(
+      `/api/settings/email/templates`,
+      input
+    );
+    return { success: true, data: response.data, message: response.message };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Failed to create email template",
+    };
+  }
+}
+
+/**
+ * Update email template
+ */
+export async function updateEmailTemplateAction(id: string, input: UpdateEmailTemplateInput) {
+  try {
+    const response = await http.patch<{ data: EmailTemplateResponse; message: string }>(
+      `/api/settings/email/templates/${id}`,
+      input
+    );
+    return { success: true, data: response.data, message: response.message };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Failed to update email template",
+    };
+  }
+}
+
+/**
+ * Delete email template
+ */
+export async function deleteEmailTemplateAction(id: string) {
+  try {
+    const response = await http.delete<{ message: string }>(
+      `/api/settings/email/templates/${id}`
+    );
+    return { success: true, message: response.message };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Failed to delete email template",
+    };
+  }
+}

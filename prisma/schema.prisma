@@ -232,3 +232,23 @@ model Backup {
   @@index([status])
   @@index([createdAt])
 }
+
+model EmailTemplate {
+  id          String    @id @default(cuid())
+  slug        String    @unique // e.g., welcome, reset-password, order-confirm
+  name        String // Display name
+  subject     String // Email subject with variable support
+  body        String    @db.Text // Email body content (HTML/Markdown)
+  bodyType    String    @default("html") // html or markdown
+  description String? // Help text about when this template is used
+  variables   Json? // Available variables: [{ key: "name", description: "User's name" }]
+  isSystem    Boolean   @default(false) // System templates cannot be deleted
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([slug])
+  @@index([isActive])
+  @@index([deletedAt])
+}
