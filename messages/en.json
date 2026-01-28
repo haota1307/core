@@ -100,7 +100,9 @@
       "SEND_FAILED": "Failed to send verification code. Please try again.",
       "VERIFICATION_FAILED": "Invalid verification code. Please check and try again.",
       "INVALID_CODE": "Code must be 6 digits",
-      "passwordResetSuccess": "Password reset successfully"
+      "passwordResetSuccess": "Password reset successfully",
+      "GOOGLE_AUTH_FAILED": "Google sign-in failed. Please try again.",
+      "GOOGLE_NOT_CONFIGURED": "Google sign-in is not configured."
     },
     "success": {
       "loginSuccess": "Login successful",

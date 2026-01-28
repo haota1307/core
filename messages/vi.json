@@ -100,7 +100,9 @@
       "SEND_FAILED": "Gửi mã xác thực thất bại. Vui lòng thử lại.",
       "VERIFICATION_FAILED": "Mã xác thực không hợp lệ. Vui lòng kiểm tra và thử lại.",
       "INVALID_CODE": "Mã phải có 6 chữ số",
-      "passwordResetSuccess": "Đặt lại mật khẩu thành công"
+      "passwordResetSuccess": "Đặt lại mật khẩu thành công",
+      "GOOGLE_AUTH_FAILED": "Đăng nhập bằng Google thất bại. Vui lòng thử lại.",
+      "GOOGLE_NOT_CONFIGURED": "Đăng nhập bằng Google chưa được cấu hình."
     },
     "success": {
       "loginSuccess": "Đăng nhập thành công",

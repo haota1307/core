@@ -1,6 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +26,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createAuthSchemas, type LoginInput } from "../schemas";
 import { useLogin } from "../hooks/use-auth";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export function LoginForm({
   className,
@@ -32,9 +36,34 @@ export function LoginForm({
   const t = useTranslations("auth");
   const tCommon = useTranslations("common");
   const tAll = useTranslations();
+  const locale = useLocale();
+  const searchParams = useSearchParams();
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const { loginSchema } = createAuthSchemas((key, params) => tAll(key, params));
   const loginMutation = useLogin();
+
+  // Handle Google OAuth errors from URL
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      const errorMessages: Record<string, string> = {
+        google_auth_failed: t("errors.GOOGLE_AUTH_FAILED"),
+        missing_code: t("errors.GOOGLE_AUTH_FAILED"),
+        oauth_not_configured: t("errors.GOOGLE_NOT_CONFIGURED"),
+        token_exchange_failed: t("errors.GOOGLE_AUTH_FAILED"),
+        user_info_failed: t("errors.GOOGLE_AUTH_FAILED"),
+        callback_failed: t("errors.GOOGLE_AUTH_FAILED"),
+      };
+      toast.error(errorMessages[error] || t("errors.UNKNOWN_ERROR"));
+    }
+  }, [searchParams, t]);
+
+  const handleGoogleSignIn = () => {
+    setIsGoogleLoading(true);
+    // Redirect to Google OAuth endpoint
+    window.location.href = `/api/auth/google?locale=${locale}`;
+  };
 
   const {
     register,
@@ -59,13 +88,22 @@ export function LoginForm({
           <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <FieldGroup>
               <Field>
-                <Button variant="outline" type="button">
-                  <Image
-                    src="/google-icon.svg"
-                    alt="Google icon"
-                    width={20}
-                    height={20}
-                  />
+                <Button 
+                  variant="outline" 
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={isGoogleLoading || loginMutation.isPending}
+                >
+                  {isGoogleLoading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Image
+                      src="/google-icon.svg"
+                      alt="Google icon"
+                      width={20}
+                      height={20}
+                    />
+                  )}
                   {t("signInWithGoogle")}
                 </Button>
               </Field>
