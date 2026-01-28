@@ -2,12 +2,11 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { Building2 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
+import { SiteLogo } from "@/components/site-logo";
 import {
   Sidebar,
   SidebarContent,
@@ -26,22 +25,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: currentUserData, isLoading } = useCurrentUser();
   const { settings } = useSettings();
 
-  // Build team/site info from settings
-  const siteInfo = React.useMemo(
-    () => [
-      {
-        name: settings.general.siteName || "My App",
-        logo: Building2,
-        plan: settings.general.siteDescription || "Dashboard",
-      },
-    ],
-    [settings.general.siteName, settings.general.siteDescription]
-  );
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={siteInfo} />
+        <SiteLogo
+          name={settings.general.siteName || "My App"}
+          description={settings.general.siteDescription}
+          logoUrl={settings.general.siteLogo}
+        />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMain} />

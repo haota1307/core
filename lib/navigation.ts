@@ -1,17 +1,10 @@
 import {
-  BarChart3,
-  Bell,
   FileText,
-  Globe,
-  HardDrive,
-  KeyRound,
   LayoutDashboard,
-  LifeBuoy,
-  Lock,
-  Search,
   Settings2,
   ShieldCheck,
   Users,
+  VideoIcon,
   type LucideIcon,
 } from "lucide-react";
 
@@ -109,25 +102,6 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
       ],
     },
     {
-      title: tNavItems("analytics"),
-      url: "/dashboard/analytics",
-      icon: BarChart3,
-      items: [
-        {
-          title: tNavItems("traffic"),
-          url: "/dashboard/analytics/traffic",
-        },
-        {
-          title: tNavItems("events"),
-          url: "/dashboard/analytics/events",
-        },
-        {
-          title: tNavItems("conversions"),
-          url: "/dashboard/analytics/conversions",
-        },
-      ],
-    },
-    {
       title: tNavItems("settings"),
       url: "/dashboard/settings",
       icon: Settings2,
@@ -182,14 +156,9 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
       icon: ShieldCheck,
     },
     {
-      name: tNavItems("apiKeys"),
-      url: "/dashboard/api-keys",
-      icon: KeyRound,
-    },
-    {
-      name: tNavItems("support"),
-      url: "/dashboard/support",
-      icon: LifeBuoy,
-    },
+      name: tNavItems("media"),
+      url: "/dashboard/media",
+      icon: VideoIcon,
+    }
   ],
 });
