@@ -20,13 +20,13 @@ const defaultPasswordPolicy: PasswordPolicy = {
  * Factory to create Zod schemas with i18n error messages and dynamic password policy
  */
 export const createAuthSchemas = (
-  t: (key: string) => string,
+  t: (key: string, params?: Record<string, string | number | Date>) => string,
   policy: PasswordPolicy = defaultPasswordPolicy
 ) => {
   // Build password schema with dynamic requirements
   let passwordSchema = z
     .string({ message: t("auth.validation.passwordRequired") })
-    .min(policy.passwordMinLength, t("auth.validation.passwordMinLength"))
+    .min(policy.passwordMinLength, t("auth.validation.passwordMinLength", { count: policy.passwordMinLength }))
     .max(100, t("auth.validation.passwordMaxLength"));
 
   // Add regex validations based on policy

@@ -33,7 +33,7 @@ export function LoginForm({
   const tCommon = useTranslations("common");
   const tAll = useTranslations();
 
-  const { loginSchema } = createAuthSchemas((key: string) => tAll(key));
+  const { loginSchema } = createAuthSchemas((key, params) => tAll(key, params));
   const loginMutation = useLogin();
 
   const {
@@ -91,12 +91,12 @@ export function LoginForm({
                   <FieldLabel htmlFor="password">
                     {tCommon("password")}
                   </FieldLabel>
-                  <a
-                    href="#"
+                  <LocaleLink
+                    href="/auth/forgot-password"
                     className="ml-auto text-sm underline-offset-4 hover:underline"
                   >
                     {t("forgotPassword")}
-                  </a>
+                  </LocaleLink>
                 </div>
                 <Input
                   id="password"

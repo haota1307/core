@@ -135,3 +135,125 @@ export const useLogout = () => {
     },
   });
 };
+
+// Verification hooks
+export const useSendVerificationCode = () => {
+  const t = useTranslations("auth.errors");
+
+  return useMutation({
+    mutationFn: async ({ email, type }: { email: string; type: "email_verify" | "password_reset" }) => {
+      const response = await http.post<{ success: boolean }>(
+        "/api/auth/send-code", 
+        { email, type },
+        { auth: false }
+      );
+      return response;
+    },
+    onError: (error: any) => {
+      const errorCode = error.code || "UNKNOWN_ERROR";
+      let message: string;
+      try {
+        message = t(errorCode);
+      } catch {
+        message = error.message || t("UNKNOWN_ERROR");
+      }
+      toast.error(message);
+    },
+  });
+};
+
+export const useVerifyCode = () => {
+  const t = useTranslations("auth.errors");
+
+  return useMutation({
+    mutationFn: async ({ 
+      email, 
+      code, 
+      type 
+    }: { 
+      email: string; 
+      code: string; 
+      type: "email_verify" | "password_reset";
+    }) => {
+      const response = await http.post<{ success: boolean }>(
+        "/api/auth/verify-code", 
+        { email, code, type },
+        { auth: false }
+      );
+      return response;
+    },
+    onError: (error: any) => {
+      const errorCode = error.code || "UNKNOWN_ERROR";
+      let message: string;
+      try {
+        message = t(errorCode);
+      } catch {
+        message = error.message || t("UNKNOWN_ERROR");
+      }
+      toast.error(message);
+    },
+  });
+};
+
+export const useForgotPassword = () => {
+  const t = useTranslations("auth.errors");
+
+  return useMutation({
+    mutationFn: async (email: string) => {
+      const response = await http.post<{ success: boolean }>(
+        "/api/auth/forgot-password", 
+        { email },
+        { auth: false }
+      );
+      return response;
+    },
+    onError: (error: any) => {
+      const errorCode = error.code || "UNKNOWN_ERROR";
+      let message: string;
+      try {
+        message = t(errorCode);
+      } catch {
+        message = error.message || t("UNKNOWN_ERROR");
+      }
+      toast.error(message);
+    },
+  });
+};
+
+export const useResetPassword = () => {
+  const router = useRouter();
+  const t = useTranslations("auth.errors");
+
+  return useMutation({
+    mutationFn: async ({ 
+      email, 
+      code, 
+      newPassword 
+    }: { 
+      email: string; 
+      code: string; 
+      newPassword: string;
+    }) => {
+      const response = await http.post<{ success: boolean }>(
+        "/api/auth/reset-password", 
+        { email, code, newPassword },
+        { auth: false }
+      );
+      return response;
+    },
+    onSuccess: () => {
+      toast.success(t("passwordResetSuccess") || "Password reset successfully");
+      router.push("/auth/login");
+    },
+    onError: (error: any) => {
+      const errorCode = error.code || "UNKNOWN_ERROR";
+      let message: string;
+      try {
+        message = t(errorCode);
+      } catch {
+        message = error.message || t("UNKNOWN_ERROR");
+      }
+      toast.error(message);
+    },
+  });
+};

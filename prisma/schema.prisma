@@ -255,3 +255,24 @@ model EmailTemplate {
   @@index([isActive])
   @@index([deletedAt])
 }
+
+enum VerificationType {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+}
+
+model VerificationCode {
+  id          String           @id @default(cuid())
+  email       String // Email address (can be used before user exists)
+  code        String // 6-digit code
+  type        VerificationType
+  attempts    Int              @default(0) // Track failed attempts
+  maxAttempts Int              @default(5) // Max allowed attempts
+  expiresAt   DateTime // Code expiration time
+  usedAt      DateTime? // When the code was successfully used
+  createdAt   DateTime         @default(now())
+
+  @@index([email, type])
+  @@index([code])
+  @@index([expiresAt])
+}

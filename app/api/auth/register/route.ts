@@ -6,6 +6,7 @@ import prisma from "@/lib/prisma";
 import { createAuditLog, AuditAction } from "@/lib/audit-log";
 import { getSecuritySettings, validatePasswordPolicy } from "@/lib/settings";
 import { sendNewUserNotification } from "@/lib/email";
+import { VerificationType } from "@/lib/verification";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const JWT_REFRESH_SECRET =
@@ -64,13 +65,25 @@ export async function POST(request: NextRequest) {
       where: { name: "User" },
     });
 
-    // Create user with default role
+    // Check if email was verified (verification code was used recently)
+    const recentVerification = await prisma.verificationCode.findFirst({
+      where: {
+        email,
+        type: VerificationType.EMAIL_VERIFY,
+        // Code used within last 10 minutes
+        usedAt: { gte: new Date(Date.now() - 10 * 60 * 1000) },
+      },
+      orderBy: { usedAt: "desc" },
+    });
+
+    // Create user with default role and verified email if applicable
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
         roleId: defaultRole?.id, // Assign default User role
+        emailVerified: recentVerification ? new Date() : null,
       },
     });
 
