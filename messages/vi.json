@@ -123,30 +123,56 @@
       "overview": "Bảng điều khiển",
       "analytics": "Phân tích",
       "reports": "Báo cáo",
+
+      "myLearning": "Học tập của tôi",
+      "enrolledCourses": "Khóa học đã đăng ký",
+      "learningProgress": "Tiến độ học tập",
+      "certificates": "Chứng chỉ",
+      "wishlist": "Danh sách yêu thích",
+
+      "instructorDashboard": "Giảng viên",
+      "myCoursesList": "Khóa học của tôi",
+      "createCourse": "Tạo khóa học",
+      "myStudents": "Học viên của tôi",
+      "courseAnalytics": "Thống kê khóa học",
+      "earnings": "Thu nhập",
+
+      "courseManagement": "Quản lý khóa học",
+      "allCourses": "Tất cả khóa học",
+      "pendingApproval": "Chờ duyệt",
+      "browseCourses": "Duyệt khóa học",
+
       "users": "Người dùng",
-      "usersList": "Danh sách người dùng",
+      "allUsers": "Tất cả người dùng",
+      "instructors": "Giảng viên",
       "roles": "Vai trò",
       "permissions": "Quyền hạn",
-      "content": "Quản lý nội dung",
+
+      "content": "Nội dung",
       "posts": "Bài viết",
       "pages": "Trang",
       "media": "Thư viện media",
+
+      "reviews": "Đánh giá",
+      "allReviews": "Tất cả đánh giá",
+      "pendingReviews": "Chờ duyệt",
+      "reportedReviews": "Báo cáo vi phạm",
+
+      "payments": "Thanh toán",
+      "transactions": "Giao dịch",
+      "payouts": "Chi trả",
+      "refunds": "Hoàn tiền",
+
       "categories": "Danh mục",
-      "traffic": "Lưu lượng truy cập",
-      "events": "Sự kiện",
-      "conversions": "Chuyển đổi",
       "settings": "Cài đặt",
       "general": "Tổng quan",
       "email": "Email",
       "security": "Bảo mật",
       "mediaSettings": "Cài đặt Media",
-      "notifications": "Thông báo",
-      "seo": "SEO & Mạng xã hội",
-      "localization": "Ngôn ngữ",
       "backup": "Sao lưu",
-      "auditLogs": "Nhật ký kiểm tra",
-      "apiKeys": "Khóa API",
-      "support": "Trung tâm hỗ trợ"
+
+      "messages": "Tin nhắn",
+      "auditLogs": "Nhật ký hệ thống"
     },
     "user": {
       "profile": "Thông tin cá nhân",

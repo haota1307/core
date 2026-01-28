@@ -1,49 +1,59 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import {
-  Folder,
-  Forward,
-  MoreHorizontal,
-  Trash2,
-  type LucideIcon,
-} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { LocaleLink } from "@/components/locale-link";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/ui/sidebar";
+import { usePermissions } from "@/lib/hooks/use-permissions";
 
-export function NavProjects({
-  projects,
-}: {
-  projects: {
-    name: string;
-    url: string;
-    icon: LucideIcon;
-  }[];
-}) {
-  const { isMobile } = useSidebar();
+interface QuickLink {
+  name: string;
+  url: string;
+  icon: LucideIcon;
+  permission?: string;
+  permissions?: string[]; // OR logic
+}
+
+export function NavProjects({ projects }: { projects: QuickLink[] }) {
   const t = useTranslations("nav");
+  const { permissions, loading } = usePermissions();
+
+  // Helper to check if user has permission
+  const hasPermission = (permission?: string) => {
+    if (!permission) return true;
+    return permissions.includes(permission);
+  };
+
+  // Helper to check if user has any of the permissions (OR logic)
+  const hasAnyPermission = (perms?: string[]) => {
+    if (!perms || perms.length === 0) return true;
+    return perms.some((p) => permissions.includes(p));
+  };
+
+  // Filter projects based on permissions
+  const filteredProjects = projects.filter((item) => {
+    if (item.permission && !hasPermission(item.permission)) return false;
+    if (item.permissions && !hasAnyPermission(item.permissions)) return false;
+    return true;
+  });
+
+  // Don't render if no items or loading
+  if (loading || filteredProjects.length === 0) {
+    return null;
+  }
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>{t("quickLinks")}</SidebarGroupLabel>
       <SidebarMenu>
-        {projects.map((item) => (
+        {filteredProjects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
               <LocaleLink href={item.url}>
@@ -51,33 +61,6 @@ export function NavProjects({
                 <span>{item.name}</span>
               </LocaleLink>
             </SidebarMenuButton>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuAction showOnHover>
-                  <MoreHorizontal />
-                  <span className="sr-only">{t("actions.more")}</span>
-                </SidebarMenuAction>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-48 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
-              >
-                <DropdownMenuItem>
-                  <Folder className="text-muted-foreground" />
-                  <span>{t("actions.viewProject")}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Forward className="text-muted-foreground" />
-                  <span>{t("actions.shareProject")}</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Trash2 className="text-muted-foreground" />
-                  <span>{t("actions.deleteProject")}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </SidebarMenuItem>
         ))}
       </SidebarMenu>

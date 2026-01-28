@@ -4,34 +4,81 @@ import bcrypt from "bcryptjs";
 
 // Permissions theo module
 const PERMISSIONS = [
+  // Dashboard
+  { code: "dashboard.view", desc: "Truy cập dashboard" },
+  { code: "dashboard.analytics", desc: "Xem analytics tổng quan" },
+
+  // Users Management
   { code: "users.view", desc: "Xem danh sách người dùng" },
   { code: "users.create", desc: "Tạo người dùng" },
   { code: "users.edit", desc: "Chỉnh sửa người dùng" },
   { code: "users.delete", desc: "Xóa người dùng" },
-  { code: "users.manage_roles", desc: "Quản lý vai trò" },
+  { code: "users.manage_roles", desc: "Quản lý vai trò người dùng" },
+
+  // Roles & Permissions
   { code: "roles.view", desc: "Xem vai trò" },
   { code: "roles.create", desc: "Tạo vai trò" },
   { code: "roles.edit", desc: "Chỉnh sửa vai trò" },
   { code: "roles.delete", desc: "Xóa vai trò" },
-  { code: "roles.manage_permissions", desc: "Quản lý quyền" },
+  { code: "roles.manage_permissions", desc: "Quản lý quyền của vai trò" },
   { code: "permissions.view", desc: "Xem quyền" },
   { code: "permissions.manage", desc: "Quản lý quyền" },
-  { code: "dashboard.view", desc: "Truy cập dashboard" },
-  { code: "dashboard.analytics", desc: "Xem analytics" },
+
+  // Courses - Student
+  { code: "courses.browse", desc: "Duyệt khóa học" },
+  { code: "courses.enroll", desc: "Đăng ký khóa học" },
+  { code: "courses.enrolled", desc: "Xem khóa học đã đăng ký" },
+  { code: "certificates.view", desc: "Xem chứng chỉ" },
+
+  // Courses - Instructor
+  { code: "courses.create", desc: "Tạo khóa học mới" },
+  { code: "courses.manage_own", desc: "Quản lý khóa học của mình" },
+  { code: "courses.analytics", desc: "Xem thống kê khóa học" },
+  { code: "students.view_own", desc: "Xem học viên của mình" },
+  { code: "earnings.view", desc: "Xem thu nhập" },
+
+  // Courses - Admin
+  { code: "courses.manage_all", desc: "Quản lý tất cả khóa học" },
+  { code: "courses.approve", desc: "Duyệt khóa học" },
+  { code: "categories.manage", desc: "Quản lý danh mục" },
+  { code: "instructors.manage", desc: "Quản lý giảng viên" },
+
+  // Content
+  { code: "content.view", desc: "Xem nội dung" },
+  { code: "content.create", desc: "Tạo nội dung" },
+  { code: "content.edit", desc: "Chỉnh sửa nội dung" },
+  { code: "content.delete", desc: "Xóa nội dung" },
+  { code: "content.manage", desc: "Quản lý toàn bộ nội dung" },
+
+  // Media
   { code: "media.view", desc: "Xem thư viện media" },
   { code: "media.upload", desc: "Upload media" },
   { code: "media.edit", desc: "Chỉnh sửa media" },
   { code: "media.delete", desc: "Xóa media" },
   { code: "media.manage", desc: "Quản lý toàn bộ media" },
+
+  // Reviews
+  { code: "reviews.create", desc: "Tạo đánh giá" },
+  { code: "reviews.manage", desc: "Quản lý đánh giá" },
+
+  // Payments
+  { code: "payments.view", desc: "Xem giao dịch" },
+  { code: "payments.manage", desc: "Quản lý thanh toán" },
+  { code: "payouts.manage", desc: "Quản lý chi trả" },
+  { code: "refunds.manage", desc: "Quản lý hoàn tiền" },
+
+  // Messages
+  { code: "messages.view", desc: "Xem tin nhắn" },
+  { code: "messages.send", desc: "Gửi tin nhắn" },
+
+  // Audit Logs
   { code: "audit_logs.view", desc: "Xem nhật ký hệ thống" },
   { code: "audit_logs.delete", desc: "Xóa nhật ký cũ" },
+
+  // Settings
   { code: "settings.view", desc: "Xem cài đặt hệ thống" },
   { code: "settings.edit", desc: "Chỉnh sửa cài đặt hệ thống" },
   { code: "settings.backup", desc: "Sao lưu & khôi phục dữ liệu" },
-  {
-    code: "settings:manage",
-    desc: "Quản lý cài đặt hệ thống (backup, restore)",
-  },
 ];
 
 // Roles với permissions
@@ -47,10 +94,16 @@ const ROLES = [
     desc: "Quản trị viên",
     isSystem: true,
     perms: [
+      // Dashboard
+      "dashboard.view",
+      "dashboard.analytics",
+      // Users
       "users.view",
       "users.create",
       "users.edit",
+      "users.delete",
       "users.manage_roles",
+      // Roles & Permissions
       "roles.view",
       "roles.create",
       "roles.edit",
@@ -58,26 +111,91 @@ const ROLES = [
       "roles.manage_permissions",
       "permissions.view",
       "permissions.manage",
-      "dashboard.view",
-      "dashboard.analytics",
+      // Courses Admin
+      "courses.browse",
+      "courses.manage_all",
+      "courses.approve",
+      "categories.manage",
+      "instructors.manage",
+      // Content
+      "content.view",
+      "content.create",
+      "content.edit",
+      "content.delete",
+      "content.manage",
+      // Media
       "media.view",
       "media.upload",
       "media.edit",
       "media.delete",
       "media.manage",
+      // Reviews
+      "reviews.manage",
+      // Payments
+      "payments.view",
+      "payments.manage",
+      "payouts.manage",
+      "refunds.manage",
+      // Messages
+      "messages.view",
+      "messages.send",
+      // Audit Logs
       "audit_logs.view",
       "audit_logs.delete",
+      // Settings
       "settings.view",
       "settings.edit",
       "settings.backup",
-      "settings:manage",
+    ],
+  },
+  {
+    name: "Instructor",
+    desc: "Giảng viên",
+    isSystem: true,
+    perms: [
+      // Dashboard
+      "dashboard.view",
+      "dashboard.analytics",
+      // Courses - Instructor
+      "courses.browse",
+      "courses.create",
+      "courses.manage_own",
+      "courses.analytics",
+      "students.view_own",
+      "earnings.view",
+      // Media
+      "media.view",
+      "media.upload",
+      "media.edit",
+      "media.delete",
+      // Messages
+      "messages.view",
+      "messages.send",
+      // Reviews (read own)
+      "reviews.create",
     ],
   },
   {
     name: "User",
-    desc: "Người dùng thông thường",
+    desc: "Học viên",
     isSystem: true,
-    perms: ["dashboard.view", "media.view", "media.upload"],
+    perms: [
+      // Dashboard
+      "dashboard.view",
+      // Courses - Student
+      "courses.browse",
+      "courses.enroll",
+      "courses.enrolled",
+      "certificates.view",
+      // Media (basic)
+      "media.view",
+      "media.upload",
+      // Reviews
+      "reviews.create",
+      // Messages
+      "messages.view",
+      "messages.send",
+    ],
   },
 ];
 
