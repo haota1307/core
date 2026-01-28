@@ -822,10 +822,6 @@
     "security": {
       "title": "Cài đặt bảo mật",
       "description": "Cấu hình xác thực và chính sách bảo mật",
-      "twoFactor": "Xác thực hai yếu tố",
-      "twoFactorDescription": "Yêu cầu xác minh bổ sung khi đăng nhập",
-      "requireTwoFactor": "Bắt buộc 2FA cho tất cả người dùng",
-      "requireTwoFactorDescription": "Buộc tất cả người dùng thiết lập xác thực hai yếu tố",
       "passwordPolicy": "Chính sách mật khẩu",
       "passwordPolicyDescription": "Định nghĩa yêu cầu mật khẩu cho tài khoản người dùng",
       "minLength": "Độ dài tối thiểu",
@@ -838,19 +834,13 @@
       "sessionLockout": "Phiên & Khóa tài khoản",
       "sessionLockoutDescription": "Cấu hình hết hạn phiên và khóa tài khoản",
       "sessionTimeout": "Thời gian hết phiên",
+      "sessionTimeoutDescription": "Thời gian không hoạt động trước khi phiên hết hạn",
       "minutes": "phút",
       "maxAttempts": "Số lần đăng nhập tối đa",
+      "maxAttemptsDescription": "Số lần đăng nhập sai trước khi khóa tài khoản",
       "attempts": "lần",
       "lockoutDuration": "Thời gian khóa",
-      "captcha": "Bảo vệ CAPTCHA",
-      "captchaDescription": "Bảo vệ form khỏi các gửi tự động",
-      "enableCaptcha": "Bật CAPTCHA",
-      "enableCaptchaDescription": "Hiển thị CAPTCHA trên form đăng nhập và đăng ký",
-      "captchaProvider": "Nhà cung cấp CAPTCHA",
-      "siteKey": "Site Key",
-      "siteKeyPlaceholder": "Nhập site key",
-      "secretKey": "Secret Key",
-      "secretKeyPlaceholder": "Nhập secret key"
+      "lockoutDurationDescription": "Thời gian khóa tài khoản sau khi đăng nhập sai quá nhiều lần"
     },
     "notifications": {
       "title": "Cài đặt thông báo",

@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import prisma from "@/lib/prisma";
 import { createAuditLog, AuditAction } from "@/lib/audit-log";
 import { getSecuritySettings, validatePasswordPolicy } from "@/lib/settings";
+import { sendNewUserNotification } from "@/lib/email";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 const JWT_REFRESH_SECRET =
@@ -113,6 +114,11 @@ export async function POST(request: NextRequest) {
       },
       request
     );
+
+    // Send notification to admins (non-blocking)
+    sendNewUserNotification({ name: user.name, email: user.email }).catch(() => {
+      // Silently ignore notification errors
+    });
 
     return NextResponse.json(
       {

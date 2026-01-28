@@ -224,7 +224,6 @@ export type MediaSettingsInput = z.infer<typeof mediaSettingsSchema>;
 // ============================================
 
 export const securitySettingsSchema = z.object({
-  requireTwoFactor: z.boolean(),
   passwordMinLength: z.number().int().min(6).max(32),
   passwordRequireUppercase: z.boolean(),
   passwordRequireLowercase: z.boolean(),
@@ -233,10 +232,6 @@ export const securitySettingsSchema = z.object({
   sessionTimeout: z.number().int().positive(), // minutes
   maxLoginAttempts: z.number().int().positive(),
   lockoutDuration: z.number().int().positive(), // minutes
-  enableCaptcha: z.boolean(),
-  captchaProvider: z.enum(["recaptcha", "hcaptcha", "turnstile"]),
-  captchaSiteKey: z.string().optional(),
-  captchaSecretKey: z.string().optional(),
 });
 
 export type SecuritySettingsInput = z.infer<typeof securitySettingsSchema>;

@@ -38,6 +38,11 @@ export interface MediaSettings {
   imageOptimizationFormat: "auto" | "webp" | "avif" | "jpg" | "png";
   maxImageWidth: number;
   maxImageHeight: number;
+  // Watermark settings
+  enableWatermark: boolean;
+  watermarkImage?: string;
+  watermarkPosition: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "center";
+  watermarkOpacity: number;
   // Video settings (Cloudinary only)
   enableVideoEncryption: boolean;
   videoEncryptionMethod: string;
@@ -138,6 +143,11 @@ async function getMediaSettings(): Promise<MediaSettings> {
       imageOptimizationFormat: (settingsMap.imageOptimizationFormat as MediaSettings["imageOptimizationFormat"]) || "auto",
       maxImageWidth: settingsMap.maxImageWidth ? Number(settingsMap.maxImageWidth) : 1920,
       maxImageHeight: settingsMap.maxImageHeight ? Number(settingsMap.maxImageHeight) : 1080,
+      // Watermark settings
+      enableWatermark: settingsMap.enableWatermark === "true",
+      watermarkImage: settingsMap.watermarkImage || undefined,
+      watermarkPosition: (settingsMap.watermarkPosition as MediaSettings["watermarkPosition"]) || "bottom-right",
+      watermarkOpacity: settingsMap.watermarkOpacity ? Number(settingsMap.watermarkOpacity) : 50,
       // Video settings
       enableVideoEncryption: settingsMap.enableVideoEncryption === "true",
       videoEncryptionMethod: settingsMap.videoEncryptionMethod || "none",
@@ -164,6 +174,11 @@ async function getMediaSettings(): Promise<MediaSettings> {
       imageOptimizationFormat: "auto",
       maxImageWidth: 1920,
       maxImageHeight: 1080,
+      // Watermark defaults
+      enableWatermark: false,
+      watermarkImage: undefined,
+      watermarkPosition: "bottom-right",
+      watermarkOpacity: 50,
       // Video defaults
       enableVideoEncryption: false,
       videoEncryptionMethod: "none",
@@ -264,6 +279,22 @@ async function uploadToCloudinary(
         },
       ];
       uploadOptions.eager_async = true;
+    }
+  }
+
+  // Image watermark (Cloudinary overlay)
+  if (isImage && settings.enableWatermark && settings.watermarkImage) {
+    const watermarkOverlay = getCloudinaryWatermarkOverlay(settings);
+    if (watermarkOverlay) {
+      // If there's already a transformation, merge with watermark
+      if (uploadOptions.transformation) {
+        uploadOptions.transformation = [
+          uploadOptions.transformation,
+          ...watermarkOverlay,
+        ];
+      } else {
+        uploadOptions.transformation = watermarkOverlay;
+      }
     }
   }
 
@@ -393,6 +424,176 @@ export async function generateThumbnail(
       position: "center",
     })
     .toFile(outputPath);
+}
+
+/**
+ * Apply watermark to image buffer (for local storage)
+ */
+async function applyWatermarkToBuffer(
+  imageBuffer: Buffer,
+  settings: MediaSettings
+): Promise<Buffer> {
+  if (!settings.enableWatermark || !settings.watermarkImage) {
+    return imageBuffer;
+  }
+
+  try {
+    // Get metadata first
+    const metadata = await sharp(imageBuffer).metadata();
+    
+    if (!metadata.width || !metadata.height) {
+      return imageBuffer;
+    }
+
+    // Try to load watermark image
+    let watermarkBuffer: Buffer;
+    
+    if (settings.watermarkImage.startsWith("http")) {
+      // Download watermark from URL
+      const response = await fetch(settings.watermarkImage);
+      if (!response.ok) {
+        console.error("Failed to fetch watermark image");
+        return imageBuffer;
+      }
+      watermarkBuffer = Buffer.from(await response.arrayBuffer());
+    } else {
+      // Load from local path - handle both with and without leading slash
+      const watermarkImagePath = settings.watermarkImage.startsWith("/") 
+        ? settings.watermarkImage.substring(1) 
+        : settings.watermarkImage;
+      const watermarkPath = path.join(process.cwd(), "public", watermarkImagePath);
+      try {
+        watermarkBuffer = await fs.readFile(watermarkPath);
+      } catch (err) {
+        console.error("Failed to load local watermark image:", watermarkPath, err);
+        return imageBuffer;
+      }
+    }
+
+    // Resize watermark to be proportional to image (max 20% of image width)
+    const maxWatermarkWidth = Math.floor(metadata.width * 0.2);
+    const resizedWatermark = await sharp(watermarkBuffer)
+      .resize(maxWatermarkWidth, null, { fit: "inside" })
+      .ensureAlpha()
+      .toBuffer();
+
+    const watermarkMeta = await sharp(resizedWatermark).metadata();
+    const watermarkWidth = watermarkMeta.width || maxWatermarkWidth;
+    const watermarkHeight = watermarkMeta.height || maxWatermarkWidth;
+
+    // Calculate position based on settings
+    let left = 10;
+    let top = 10;
+    const padding = 20;
+
+    switch (settings.watermarkPosition) {
+      case "top-left":
+        left = padding;
+        top = padding;
+        break;
+      case "top-right":
+        left = metadata.width - watermarkWidth - padding;
+        top = padding;
+        break;
+      case "bottom-left":
+        left = padding;
+        top = metadata.height - watermarkHeight - padding;
+        break;
+      case "bottom-right":
+        left = metadata.width - watermarkWidth - padding;
+        top = metadata.height - watermarkHeight - padding;
+        break;
+      case "center":
+        left = Math.floor((metadata.width - watermarkWidth) / 2);
+        top = Math.floor((metadata.height - watermarkHeight) / 2);
+        break;
+    }
+
+    // Apply opacity to watermark using composite blend
+    // The opacity is applied via the composite operation
+    const opacity = Math.round((settings.watermarkOpacity / 100) * 255);
+    
+    // Create watermark with adjusted alpha channel
+    const { data, info } = await sharp(resizedWatermark)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    // Adjust alpha channel for opacity
+    for (let i = 3; i < data.length; i += 4) {
+      data[i] = Math.round((data[i] * opacity) / 255);
+    }
+
+    const watermarkWithOpacity = await sharp(data, {
+      raw: {
+        width: info.width,
+        height: info.height,
+        channels: 4,
+      },
+    })
+      .png()
+      .toBuffer();
+
+    // Composite watermark onto image
+    return await sharp(imageBuffer)
+      .composite([
+        {
+          input: watermarkWithOpacity,
+          left: Math.max(0, Math.round(left)),
+          top: Math.max(0, Math.round(top)),
+          blend: "over",
+        },
+      ])
+      .toBuffer();
+  } catch (error) {
+    console.error("Error applying watermark:", error);
+    return imageBuffer;
+  }
+}
+
+/**
+ * Get Cloudinary watermark overlay options
+ */
+function getCloudinaryWatermarkOverlay(settings: MediaSettings): Record<string, unknown>[] | undefined {
+  if (!settings.enableWatermark || !settings.watermarkImage) {
+    return undefined;
+  }
+
+  // For Cloudinary, we need to use a public_id of an uploaded watermark image
+  // The watermarkImage should be the public_id or URL of the watermark in Cloudinary
+  let watermarkPublicId = settings.watermarkImage;
+  
+  // If it's a URL, try to extract public_id (simplified)
+  if (watermarkPublicId.includes("cloudinary.com")) {
+    const match = watermarkPublicId.match(/\/upload\/(?:v\d+\/)?(.+?)(?:\.[^.]+)?$/);
+    if (match) {
+      watermarkPublicId = match[1];
+    }
+  } else if (watermarkPublicId.startsWith("/")) {
+    // Remove leading slash for local path references
+    watermarkPublicId = watermarkPublicId.substring(1);
+  }
+
+  // Map position to Cloudinary gravity
+  const gravityMap: Record<string, string> = {
+    "top-left": "north_west",
+    "top-right": "north_east",
+    "bottom-left": "south_west",
+    "bottom-right": "south_east",
+    "center": "center",
+  };
+
+  return [
+    {
+      overlay: watermarkPublicId.replace(/\//g, ":"),
+      gravity: gravityMap[settings.watermarkPosition] || "south_east",
+      opacity: settings.watermarkOpacity,
+      width: 0.2,
+      flags: "relative",
+      x: 20,
+      y: 20,
+    },
+  ];
 }
 
 // ============================================
@@ -534,9 +735,15 @@ async function uploadToLocal(
   // Ensure upload directory exists
   await ensureUploadDir(uploadDir);
 
+  // Apply watermark to images if enabled
+  let processedBuffer = buffer;
+  if (file.type.startsWith("image/") && file.type !== "image/svg+xml" && settings.enableWatermark) {
+    processedBuffer = await applyWatermarkToBuffer(buffer, settings);
+  }
+
   // Write file
   const filePath = path.join(uploadDir, filename);
-  await fs.writeFile(filePath, buffer);
+  await fs.writeFile(filePath, processedBuffer);
 
   // Generate URL
   const url = `/${settings.localUploadPath || "uploads"}/${filename}`;
@@ -546,7 +753,7 @@ async function uploadToLocal(
     filename,
     originalName: file.name,
     mimeType: file.type,
-    size: file.size,
+    size: processedBuffer.length, // Use processed buffer size
     path: filePath,
     url,
     storageProvider: "local",
@@ -555,8 +762,8 @@ async function uploadToLocal(
   // Handle image-specific processing
   if (file.type.startsWith("image/") && file.type !== "image/svg+xml") {
     try {
-      // Get dimensions
-      const dimensions = await getImageDimensions(buffer);
+      // Get dimensions from processed buffer
+      const dimensions = await getImageDimensions(processedBuffer);
       if (dimensions) {
         result.width = dimensions.width;
         result.height = dimensions.height;

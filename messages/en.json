@@ -822,10 +822,6 @@
     "security": {
       "title": "Security Settings",
       "description": "Configure authentication and security policies",
-      "twoFactor": "Two-Factor Authentication",
-      "twoFactorDescription": "Require additional verification for login",
-      "requireTwoFactor": "Require 2FA for All Users",
-      "requireTwoFactorDescription": "Force all users to set up two-factor authentication",
       "passwordPolicy": "Password Policy",
       "passwordPolicyDescription": "Define password requirements for user accounts",
       "minLength": "Minimum Length",
@@ -838,19 +834,13 @@
       "sessionLockout": "Session & Lockout",
       "sessionLockoutDescription": "Configure session timeout and account lockout",
       "sessionTimeout": "Session Timeout",
+      "sessionTimeoutDescription": "Time of inactivity before session expires",
       "minutes": "minutes",
       "maxAttempts": "Max Login Attempts",
+      "maxAttemptsDescription": "Number of failed login attempts before account lockout",
       "attempts": "attempts",
       "lockoutDuration": "Lockout Duration",
-      "captcha": "CAPTCHA Protection",
-      "captchaDescription": "Protect forms from automated submissions",
-      "enableCaptcha": "Enable CAPTCHA",
-      "enableCaptchaDescription": "Show CAPTCHA on login and registration forms",
-      "captchaProvider": "CAPTCHA Provider",
-      "siteKey": "Site Key",
-      "siteKeyPlaceholder": "Enter site key",
-      "secretKey": "Secret Key",
-      "secretKeyPlaceholder": "Enter secret key"
+      "lockoutDurationDescription": "How long account stays locked after too many failed attempts"
     },
     "notifications": {
       "title": "Notification Settings",

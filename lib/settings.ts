@@ -141,7 +141,6 @@ export async function getSettingsByGroup(
 }
 
 export type SecuritySettings = {
-  requireTwoFactor: boolean;
   passwordMinLength: number;
   passwordRequireUppercase: boolean;
   passwordRequireLowercase: boolean;
@@ -150,14 +149,9 @@ export type SecuritySettings = {
   sessionTimeout: number; // in minutes
   maxLoginAttempts: number;
   lockoutDuration: number; // in minutes
-  enableCaptcha: boolean;
-  captchaProvider: string;
-  captchaSiteKey: string;
-  captchaSecretKey: string;
 };
 
 const defaultSecuritySettings: SecuritySettings = {
-  requireTwoFactor: false,
   passwordMinLength: 8,
   passwordRequireUppercase: true,
   passwordRequireLowercase: true,
@@ -166,10 +160,6 @@ const defaultSecuritySettings: SecuritySettings = {
   sessionTimeout: 60,
   maxLoginAttempts: 5,
   lockoutDuration: 15,
-  enableCaptcha: false,
-  captchaProvider: "recaptcha",
-  captchaSiteKey: "",
-  captchaSecretKey: "",
 };
 
 /**
