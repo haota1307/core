@@ -45,6 +45,8 @@ export const POST = withPermission(
           path: uploadResult.path,
           url: uploadResult.url,
           thumbnailUrl: uploadResult.thumbnailUrl || null,
+          publicId: uploadResult.publicId || null,
+          storageProvider: uploadResult.storageProvider || "local",
           alt: alt || null,
           title: title || null,
           description: description || null,

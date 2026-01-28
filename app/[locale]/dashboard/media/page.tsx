@@ -12,6 +12,7 @@ import {
   MediaEditDialog,
   MediaDeleteDialog,
   MediaMoveDialog,
+  MediaPreviewDialog,
   FolderCard,
   FolderDialog,
   FolderDeleteDialog,
@@ -47,6 +48,7 @@ const MediaPage = () => {
   const [editingMedia, setEditingMedia] = useState<MediaResponse | null>(null);
   const [deletingMedia, setDeletingMedia] = useState<MediaResponse | null>(null);
   const [movingMedia, setMovingMedia] = useState<MediaResponse | null>(null);
+  const [previewingMedia, setPreviewingMedia] = useState<MediaResponse | null>(null);
 
   const [isFolderDialogOpen, setIsFolderDialogOpen] = useState(false);
   const [folderDialogParentId, setFolderDialogParentId] = useState<string | null>(null);
@@ -292,6 +294,7 @@ const MediaPage = () => {
                   <MediaCard
                     key={media.id}
                     media={media}
+                    onPreview={setPreviewingMedia}
                     onEdit={hasEditPermission ? setEditingMedia : undefined}
                     onMove={hasEditPermission ? setMovingMedia : undefined}
                     onDelete={hasDeletePermission ? setDeletingMedia : undefined}
@@ -375,6 +378,12 @@ const MediaPage = () => {
         open={!!movingMedia}
         onOpenChange={(open) => !open && setMovingMedia(null)}
         media={movingMedia}
+      />
+
+      <MediaPreviewDialog
+        open={!!previewingMedia}
+        onOpenChange={(open) => !open && setPreviewingMedia(null)}
+        media={previewingMedia}
       />
 
       <FolderDialog

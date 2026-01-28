@@ -154,8 +154,9 @@ export const DELETE = withPermission(
 
       // Delete physical files (optional - can be done by background job)
       try {
-        await deleteFile(existingMedia.path);
-        if (existingMedia.thumbnailUrl) {
+        // Pass publicId for Cloudinary deletion
+        await deleteFile(existingMedia.path, existingMedia.publicId || undefined);
+        if (existingMedia.thumbnailUrl && existingMedia.storageProvider === "local") {
           await deleteThumbnail(existingMedia.filename);
         }
       } catch (error) {

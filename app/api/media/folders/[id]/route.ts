@@ -147,7 +147,25 @@ export const PATCH = withPermission(
   }
 );
 
-// DELETE /api/media/folders/:id - Delete folder
+// Helper function to recursively get all subfolder IDs
+async function getAllSubfolderIds(folderId: string): Promise<string[]> {
+  const subfolders = await prisma.mediaFolder.findMany({
+    where: { parentId: folderId, deletedAt: null },
+    select: { id: true },
+  });
+
+  const subfolderIds = subfolders.map((f) => f.id);
+  
+  // Recursively get subfolders of subfolders
+  for (const subfolder of subfolders) {
+    const nestedIds = await getAllSubfolderIds(subfolder.id);
+    subfolderIds.push(...nestedIds);
+  }
+
+  return subfolderIds;
+}
+
+// DELETE /api/media/folders/:id - Delete folder and all contents
 export const DELETE = withPermission(
   "media.manage",
   async (
@@ -159,13 +177,6 @@ export const DELETE = withPermission(
 
       const existingFolder = await prisma.mediaFolder.findFirst({
         where: { id, deletedAt: null },
-        include: {
-          _count: {
-            select: {
-              children: true,
-            },
-          },
-        },
       });
 
       if (!existingFolder) {
@@ -175,31 +186,40 @@ export const DELETE = withPermission(
         );
       }
 
-      // Check if folder has subfolders
-      if (existingFolder._count.children > 0) {
-        return NextResponse.json(
-          {
-            code: "HAS_CHILDREN",
-            message:
-              "Cannot delete folder with subfolders. Please delete or move subfolders first.",
-          },
-          { status: 400 }
-        );
-      }
+      // Get all subfolder IDs recursively
+      const allSubfolderIds = await getAllSubfolderIds(id);
+      const allFolderIds = [id, ...allSubfolderIds];
 
-      // Move all media in this folder to root (folderId = null)
+      // Soft delete all media in this folder and all subfolders
       await prisma.media.updateMany({
-        where: { folderId: id },
-        data: { folderId: null },
+        where: { 
+          folderId: { in: allFolderIds },
+          deletedAt: null,
+        },
+        data: { deletedAt: new Date() },
       });
 
-      // Soft delete folder
+      // Soft delete all subfolders
+      if (allSubfolderIds.length > 0) {
+        await prisma.mediaFolder.updateMany({
+          where: { 
+            id: { in: allSubfolderIds },
+            deletedAt: null,
+          },
+          data: { deletedAt: new Date() },
+        });
+      }
+
+      // Soft delete the main folder
       await prisma.mediaFolder.update({
         where: { id },
         data: { deletedAt: new Date() },
       });
 
-      return NextResponse.json({ success: true });
+      return NextResponse.json({ 
+        success: true,
+        deletedFolders: allFolderIds.length,
+      });
     } catch (error: any) {
       console.error("Delete folder error:", error);
       return NextResponse.json(

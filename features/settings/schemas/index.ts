@@ -164,14 +164,40 @@ export interface EmailTemplateListResponse {
 // ============================================
 
 export const mediaSettingsSchema = z.object({
-  storageProvider: z.enum(["local", "s3", "cloudinary"]),
+  // Storage configuration
+  storageProvider: z.enum(["local", "cloudinary"]),
+  
+  // Local storage settings
+  localUploadPath: z.string().optional(), // e.g., "uploads" or "/var/www/uploads"
+  
+  // Cloudinary settings (required when storageProvider is "cloudinary")
+  cloudinaryCloudName: z.string().optional(),
+  cloudinaryApiKey: z.string().optional(),
+  cloudinaryApiSecret: z.string().optional(),
+  cloudinaryUploadPreset: z.string().optional(),
+  
+  // File size limits
   maxFileSize: z.number().int().positive(), // MB
+  maxVideoSize: z.number().int().positive().optional(), // MB - separate limit for videos
+  
+  // Allowed file types
   allowedImageTypes: z.array(z.string()),
   allowedDocumentTypes: z.array(z.string()),
   allowedVideoTypes: z.array(z.string()),
+  
+  // Image processing
   imageQuality: z.number().int().min(1).max(100),
   autoGenerateThumbnails: z.boolean(),
   thumbnailSizes: z.array(z.string()),
+  
+  // Cloudinary image optimization
+  enableImageOptimization: z.boolean().optional(),
+  imageOptimizationQuality: z.enum(["auto", "auto:low", "auto:eco", "auto:good", "auto:best"]).optional(),
+  imageOptimizationFormat: z.enum(["auto", "webp", "avif", "jpg", "png"]).optional(),
+  maxImageWidth: z.number().int().positive().optional(), // Max width in pixels
+  maxImageHeight: z.number().int().positive().optional(), // Max height in pixels
+  
+  // Watermark settings
   enableWatermark: z.boolean(),
   watermarkImage: z.string().optional(),
   watermarkPosition: z.enum([
@@ -182,6 +208,13 @@ export const mediaSettingsSchema = z.object({
     "center",
   ]),
   watermarkOpacity: z.number().int().min(1).max(100),
+  
+  // Video encryption settings (DRM-like protection)
+  enableVideoEncryption: z.boolean(),
+  videoEncryptionMethod: z.enum(["hls-aes", "dash-clearkey", "none"]).optional(),
+  videoEncryptionKey: z.string().optional(), // 16-byte hex key for AES-128
+  enableVideoWatermark: z.boolean().optional(), // Overlay user info on video
+  videoQualityPresets: z.array(z.string()).optional(), // e.g., ["360p", "720p", "1080p"]
 });
 
 export type MediaSettingsInput = z.infer<typeof mediaSettingsSchema>;

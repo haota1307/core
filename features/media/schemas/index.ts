@@ -13,6 +13,8 @@ export const MediaResponseSchema = z.object({
   path: z.string(),
   url: z.string(),
   thumbnailUrl: z.string().nullable(),
+  publicId: z.string().nullable().optional(), // Cloudinary public ID
+  storageProvider: z.string().default("local"), // "local" or "cloudinary"
   alt: z.string().nullable(),
   title: z.string().nullable(),
   description: z.string().nullable(),

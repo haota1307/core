@@ -247,7 +247,7 @@ export function EmailTemplateList() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t("deleteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("deleteDescription", { name: templateToDelete?.name })}
+              {t("deleteDescription", { name: templateToDelete?.name || "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

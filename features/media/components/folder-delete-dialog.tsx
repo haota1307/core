@@ -11,12 +11,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 import { useDeleteFolder } from "../hooks/use-folders";
 
 interface FolderDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  folder: { id: string; name: string; _count?: { media: number } } | null;
+  folder: { id: string; name: string; _count?: { media: number; children: number } } | null;
 }
 
 export function FolderDeleteDialog({
@@ -37,18 +39,34 @@ export function FolderDeleteDialog({
     });
   };
 
+  const hasContent = folder?._count && (folder._count.media > 0 || folder._count.children > 0);
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader className="space-y-3">
           <AlertDialogTitle className="text-xl">{t("deleteTitle")}</AlertDialogTitle>
           <AlertDialogDescription asChild>
-            <div className="text-sm text-muted-foreground space-y-2">
-              <div>{t("deleteDescription")}</div>
-              {folder && folder._count && folder._count.media > 0 && (
-                <div className="font-medium">
-                  This folder contains {folder._count.media} file(s) that will be moved to root.
-                </div>
+            <div className="text-sm text-muted-foreground space-y-3">
+              <div>
+                {t("deleteConfirm", { name: folder?.name || "" })}
+              </div>
+              
+              {hasContent && (
+                <Alert variant="destructive" className="mt-3">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription className="text-sm">
+                    <div className="font-semibold mb-1">{t("deleteWarning")}</div>
+                    <ul className="list-disc list-inside space-y-0.5">
+                      {folder._count && folder._count.children > 0 && (
+                        <li>{t("deleteSubfolders", { count: folder._count.children })}</li>
+                      )}
+                      {folder._count && folder._count.media > 0 && (
+                        <li>{t("deleteFiles", { count: folder._count.media })}</li>
+                      )}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
               )}
             </div>
           </AlertDialogDescription>

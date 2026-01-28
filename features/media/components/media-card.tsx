@@ -32,6 +32,7 @@ interface MediaCardProps {
   onDelete?: (media: MediaResponse) => void;
   onMove?: (media: MediaResponse) => void;
   onSelect?: (media: MediaResponse) => void;
+  onPreview?: (media: MediaResponse) => void;
   selectable?: boolean;
   selected?: boolean;
   viewMode?: "grid" | "list";
@@ -43,6 +44,7 @@ export function MediaCard({
   onMove,
   onDelete,
   onSelect,
+  onPreview,
   selectable = false,
   selected = false,
   viewMode = "grid",
@@ -63,7 +65,9 @@ export function MediaCard({
 
   const handleCopyUrl = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const fullUrl = `${window.location.origin}${media.url}`;
+    // Handle both local URLs (relative) and Cloudinary URLs (absolute)
+    const isAbsoluteUrl = media.url.startsWith('http://') || media.url.startsWith('https://');
+    const fullUrl = isAbsoluteUrl ? media.url : `${window.location.origin}${media.url}`;
     navigator.clipboard.writeText(fullUrl);
     toast.success(t("messages.urlCopied"));
   };
@@ -123,7 +127,13 @@ export function MediaCard({
         isDragging && "opacity-50",
         selectable && "select-none"
       )}
-      onClick={() => selectable && onSelect?.(media)}
+      onClick={() => {
+        if (selectable) {
+          onSelect?.(media);
+        } else {
+          onPreview?.(media);
+        }
+      }}
       draggable={!!onMove}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
