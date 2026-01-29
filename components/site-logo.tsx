@@ -54,3 +54,4 @@ export function SiteLogo({ name, description, logoUrl }: SiteLogoProps) {
   );
 }
 
+

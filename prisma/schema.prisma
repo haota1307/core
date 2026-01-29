@@ -29,6 +29,13 @@ model User {
   uploadedMedia Media[]
   mediaFolders  MediaFolder[]
   auditLogs     AuditLog[]
+  
+  // Course relations
+  instructorCourses  Course[]            @relation("InstructorCourses")
+  enrollments        Enrollment[]
+  reviews            Review[]
+  transactions       Transaction[]
+  instructorEarnings InstructorEarning[] @relation("InstructorEarnings")
 
   @@index([email])
   @@index([roleId])
@@ -275,4 +282,342 @@ model VerificationCode {
   @@index([email, type])
   @@index([code])
   @@index([expiresAt])
+}
+
+// ==================== COURSE MANAGEMENT ====================
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique
+  description String?
+  image       String?
+  parentId    String?
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryHierarchy")
+  courses     Course[]
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+
+  @@index([parentId])
+  @@index([slug])
+  @@index([isActive])
+  @@index([deletedAt])
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL_LEVELS
+}
+
+enum CourseStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+model Course {
+  id              String       @id @default(cuid())
+  title           String
+  slug            String       @unique
+  shortDescription String?     @db.VarChar(500)
+  description     String?      @db.Text
+  thumbnail       String?
+  previewVideo    String?
+  price           Decimal      @default(0) @db.Decimal(10, 2)
+  salePrice       Decimal?     @db.Decimal(10, 2)
+  currency        String       @default("VND")
+  level           CourseLevel  @default(ALL_LEVELS)
+  status          CourseStatus @default(DRAFT)
+  language        String       @default("vi")
+  requirements    String[]     @default([])
+  objectives      String[]     @default([]) // What students will learn
+  targetAudience  String[]     @default([]) // Who is this course for
+  
+  // Instructor
+  instructorId    String
+  instructor      User         @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
+  
+  // Category
+  categoryId      String?
+  category        Category?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  // Stats
+  totalDuration   Int          @default(0) // Total duration in seconds
+  totalLessons    Int          @default(0)
+  totalSections   Int          @default(0)
+  enrollmentCount Int          @default(0)
+  rating          Decimal      @default(0) @db.Decimal(2, 1)
+  reviewCount     Int          @default(0)
+  
+  // Dates
+  publishedAt     DateTime?
+  approvedAt      DateTime?
+  approvedBy      String?
+  rejectedAt      DateTime?
+  rejectedBy      String?
+  rejectionReason String?
+  
+  // Relations
+  sections        Section[]
+  enrollments     Enrollment[]
+  reviews         Review[]
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  deletedAt       DateTime?
+
+  @@index([instructorId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([slug])
+  @@index([publishedAt])
+  @@index([deletedAt])
+}
+
+model Section {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  courseId    String
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  sortOrder   Int       @default(0)
+  lessons     Lesson[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@index([courseId])
+  @@index([sortOrder])
+  @@index([deletedAt])
+}
+
+enum LessonType {
+  VIDEO
+  TEXT
+  QUIZ
+  ASSIGNMENT
+  LIVE
+}
+
+model Lesson {
+  id            String     @id @default(cuid())
+  title         String
+  description   String?    @db.Text
+  type          LessonType @default(VIDEO)
+  
+  // Video
+  videoUrl      String?
+  videoDuration Int        @default(0) // Duration in seconds
+  videoProvider String?    // local, youtube, vimeo, etc.
+  
+  // Content
+  content       String?    @db.Text // For TEXT type lessons
+  
+  // Settings
+  isFree        Boolean    @default(false) // Free preview
+  isPublished   Boolean    @default(false)
+  sortOrder     Int        @default(0)
+  
+  // Section
+  sectionId     String
+  section       Section    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  
+  // Progress tracking
+  progress      LessonProgress[]
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  deletedAt     DateTime?
+
+  @@index([sectionId])
+  @@index([type])
+  @@index([isPublished])
+  @@index([sortOrder])
+  @@index([deletedAt])
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+  REFUNDED
+}
+
+model Enrollment {
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId        String
+  course          Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  status          EnrollmentStatus @default(ACTIVE)
+  progress        Int              @default(0) // 0-100 percentage
+  completedAt     DateTime?
+  
+  // Payment info
+  pricePaid       Decimal          @default(0) @db.Decimal(10, 2)
+  currency        String           @default("VND")
+  transactionId   String?
+  
+  // Progress tracking
+  lessonProgress  LessonProgress[]
+  
+  enrolledAt      DateTime         @default(now())
+  expiresAt       DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  deletedAt       DateTime?
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@index([status])
+  @@index([enrolledAt])
+  @@index([deletedAt])
+}
+
+model LessonProgress {
+  id           String     @id @default(cuid())
+  enrollmentId String
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lessonId     String
+  lesson       Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  
+  isCompleted  Boolean    @default(false)
+  watchedTime  Int        @default(0) // Seconds watched
+  completedAt  DateTime?
+  
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([enrollmentId, lessonId])
+  @@index([enrollmentId])
+  @@index([lessonId])
+  @@index([isCompleted])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  rating    Int      // 1-5
+  title     String?
+  content   String?  @db.Text
+  
+  isVisible Boolean  @default(true)
+  isEdited  Boolean  @default(false)
+  
+  // Instructor response
+  response  String?  @db.Text
+  respondedAt DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+  @@index([userId])
+  @@index([rating])
+  @@index([isVisible])
+  @@index([deletedAt])
+}
+
+enum TransactionType {
+  ENROLLMENT    // User pays for course
+  PAYOUT        // Platform pays instructor
+  REFUND        // Refund to user
+  COMMISSION    // Platform commission
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model Transaction {
+  id              String            @id @default(cuid())
+  type            TransactionType
+  status          TransactionStatus @default(PENDING)
+  
+  amount          Decimal           @db.Decimal(10, 2)
+  currency        String            @default("VND")
+  
+  // User who made the payment (for ENROLLMENT) or receives (for PAYOUT)
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Related course
+  courseId        String?
+  
+  // Instructor who receives payment
+  instructorId    String?
+  
+  // Payment details
+  paymentMethod   String?           // vnpay, momo, bank_transfer, etc.
+  paymentRef      String?           // External reference
+  
+  // Commission
+  platformFee     Decimal?          @db.Decimal(10, 2)
+  instructorAmount Decimal?         @db.Decimal(10, 2)
+  
+  note            String?
+  metadata        Json?
+  
+  processedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([userId])
+  @@index([instructorId])
+  @@index([courseId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model InstructorEarning {
+  id              String   @id @default(cuid())
+  instructorId    String
+  instructor      User     @relation("InstructorEarnings", fields: [instructorId], references: [id], onDelete: Cascade)
+  
+  // Period
+  month           Int      // 1-12
+  year            Int
+  
+  // Amounts
+  totalRevenue    Decimal  @default(0) @db.Decimal(12, 2) // Gross revenue
+  platformFee     Decimal  @default(0) @db.Decimal(12, 2) // Platform commission
+  netEarnings     Decimal  @default(0) @db.Decimal(12, 2) // Net after fee
+  
+  // Stats
+  enrollmentCount Int      @default(0)
+  refundCount     Int      @default(0)
+  refundAmount    Decimal  @default(0) @db.Decimal(12, 2)
+  
+  // Payout
+  isPaidOut       Boolean  @default(false)
+  paidOutAt       DateTime?
+  payoutRef       String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([instructorId, month, year])
+  @@index([instructorId])
+  @@index([year, month])
+  @@index([isPaidOut])
 }
