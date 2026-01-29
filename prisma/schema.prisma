@@ -29,7 +29,7 @@ model User {
   uploadedMedia Media[]
   mediaFolders  MediaFolder[]
   auditLogs     AuditLog[]
-  
+
   // Course relations
   instructorCourses  Course[]            @relation("InstructorCourses")
   enrollments        Enrollment[]

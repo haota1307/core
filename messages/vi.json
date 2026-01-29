@@ -1265,5 +1265,112 @@
       "lessonDeleteError": "Lỗi xóa bài học",
       "reorderError": "Lỗi sắp xếp lại"
     }
+  },
+  "admin": {
+    "courses": {
+      "title": "Quản lý khóa học",
+      "description": "Xem và quản lý tất cả khóa học trên hệ thống",
+      "pendingTitle": "Khóa học chờ duyệt",
+      "pendingDescription": "Duyệt hoặc từ chối các khóa học đang chờ phê duyệt",
+      "table": {
+        "title": "Tiêu đề",
+        "instructor": "Giảng viên",
+        "status": "Trạng thái",
+        "level": "Cấp độ",
+        "price": "Giá",
+        "students": "Học viên",
+        "createdAt": "Ngày tạo",
+        "actions": "Thao tác",
+        "view": "Xem chi tiết",
+        "approve": "Duyệt",
+        "reject": "Từ chối",
+        "delete": "Xóa",
+        "noName": "Chưa có tên",
+        "searchPlaceholder": "Tìm khóa học...",
+        "clearFilters": "Xóa bộ lọc",
+        "columnsToggle": "Cột",
+        "toggleColumns": "Hiển thị cột",
+        "rowsSelected": "hàng đã chọn",
+        "page": "Trang",
+        "previous": "Trước",
+        "next": "Sau",
+        "empty": "Không có khóa học nào",
+        "statuses": {
+          "draft": "Bản nháp",
+          "pending_review": "Chờ duyệt",
+          "published": "Đã xuất bản",
+          "rejected": "Bị từ chối",
+          "archived": "Đã lưu trữ"
+        },
+        "levels": {
+          "beginner": "Cơ bản",
+          "intermediate": "Trung cấp",
+          "advanced": "Nâng cao",
+          "all_levels": "Tất cả"
+        }
+      },
+      "deleteDialog": {
+        "title": "Xóa khóa học",
+        "description": "Bạn có chắc chắn muốn xóa khóa học \"{title}\"? Hành động này không thể hoàn tác."
+      },
+      "approveDialog": {
+        "title": "Duyệt khóa học",
+        "description": "Bạn có chắc chắn muốn duyệt khóa học \"{title}\"? Khóa học sẽ được xuất bản ngay lập tức."
+      },
+      "rejectDialog": {
+        "title": "Từ chối khóa học",
+        "description": "Bạn có chắc chắn muốn từ chối khóa học \"{title}\"?",
+        "reasonLabel": "Lý do từ chối",
+        "reasonPlaceholder": "Nhập lý do từ chối khóa học..."
+      },
+      "messages": {
+        "courseApproved": "Đã duyệt khóa học thành công",
+        "courseRejected": "Đã từ chối khóa học",
+        "reviewError": "Lỗi khi xử lý khóa học",
+        "courseDeleted": "Đã xóa khóa học thành công",
+        "deleteError": "Lỗi khi xóa khóa học"
+      }
+    },
+    "categories": {
+      "title": "Quản lý danh mục",
+      "description": "Quản lý danh mục khóa học",
+      "addNew": "Thêm danh mục",
+      "table": {
+        "name": "Tên danh mục",
+        "slug": "Slug",
+        "description": "Mô tả",
+        "parent": "Danh mục cha",
+        "courseCount": "Số khóa học",
+        "actions": "Thao tác",
+        "edit": "Sửa",
+        "delete": "Xóa",
+        "searchPlaceholder": "Tìm danh mục...",
+        "empty": "Chưa có danh mục nào",
+        "noParent": "Không có"
+      },
+      "form": {
+        "createTitle": "Thêm danh mục mới",
+        "editTitle": "Sửa danh mục",
+        "name": "Tên danh mục",
+        "namePlaceholder": "Nhập tên danh mục",
+        "slug": "Slug",
+        "slugPlaceholder": "ten-danh-muc",
+        "description": "Mô tả",
+        "descriptionPlaceholder": "Nhập mô tả danh mục",
+        "parent": "Danh mục cha",
+        "selectParent": "Chọn danh mục cha",
+        "image": "Hình ảnh"
+      },
+      "deleteDialog": {
+        "title": "Xóa danh mục",
+        "description": "Bạn có chắc chắn muốn xóa danh mục \"{name}\"? Các khóa học trong danh mục này sẽ không còn danh mục."
+      },
+      "messages": {
+        "created": "Tạo danh mục thành công",
+        "updated": "Cập nhật danh mục thành công",
+        "deleted": "Xóa danh mục thành công",
+        "error": "Có lỗi xảy ra"
+      }
+    }
   }
 }

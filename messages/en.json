@@ -1266,5 +1266,112 @@
       "lessonDeleteError": "Failed to delete lesson",
       "reorderError": "Failed to reorder"
     }
+  },
+  "admin": {
+    "courses": {
+      "title": "Course Management",
+      "description": "View and manage all courses on the platform",
+      "pendingTitle": "Pending Courses",
+      "pendingDescription": "Approve or reject courses awaiting review",
+      "table": {
+        "title": "Title",
+        "instructor": "Instructor",
+        "status": "Status",
+        "level": "Level",
+        "price": "Price",
+        "students": "Students",
+        "createdAt": "Created",
+        "actions": "Actions",
+        "view": "View Details",
+        "approve": "Approve",
+        "reject": "Reject",
+        "delete": "Delete",
+        "noName": "No name",
+        "searchPlaceholder": "Search courses...",
+        "clearFilters": "Clear filters",
+        "columnsToggle": "Columns",
+        "toggleColumns": "Toggle columns",
+        "rowsSelected": "rows selected",
+        "page": "Page",
+        "previous": "Previous",
+        "next": "Next",
+        "empty": "No courses found",
+        "statuses": {
+          "draft": "Draft",
+          "pending_review": "Pending Review",
+          "published": "Published",
+          "rejected": "Rejected",
+          "archived": "Archived"
+        },
+        "levels": {
+          "beginner": "Beginner",
+          "intermediate": "Intermediate",
+          "advanced": "Advanced",
+          "all_levels": "All Levels"
+        }
+      },
+      "deleteDialog": {
+        "title": "Delete Course",
+        "description": "Are you sure you want to delete the course \"{title}\"? This action cannot be undone."
+      },
+      "approveDialog": {
+        "title": "Approve Course",
+        "description": "Are you sure you want to approve the course \"{title}\"? It will be published immediately."
+      },
+      "rejectDialog": {
+        "title": "Reject Course",
+        "description": "Are you sure you want to reject the course \"{title}\"?",
+        "reasonLabel": "Rejection Reason",
+        "reasonPlaceholder": "Enter the reason for rejecting this course..."
+      },
+      "messages": {
+        "courseApproved": "Course approved successfully",
+        "courseRejected": "Course rejected",
+        "reviewError": "Error processing course",
+        "courseDeleted": "Course deleted successfully",
+        "deleteError": "Error deleting course"
+      }
+    },
+    "categories": {
+      "title": "Category Management",
+      "description": "Manage course categories",
+      "addNew": "Add Category",
+      "table": {
+        "name": "Category Name",
+        "slug": "Slug",
+        "description": "Description",
+        "parent": "Parent Category",
+        "courseCount": "Courses",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "searchPlaceholder": "Search categories...",
+        "empty": "No categories yet",
+        "noParent": "None"
+      },
+      "form": {
+        "createTitle": "Add New Category",
+        "editTitle": "Edit Category",
+        "name": "Category Name",
+        "namePlaceholder": "Enter category name",
+        "slug": "Slug",
+        "slugPlaceholder": "category-name",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter category description",
+        "parent": "Parent Category",
+        "selectParent": "Select parent category",
+        "image": "Image"
+      },
+      "deleteDialog": {
+        "title": "Delete Category",
+        "description": "Are you sure you want to delete the category \"{name}\"? Courses in this category will be uncategorized."
+      },
+      "messages": {
+        "created": "Category created successfully",
+        "updated": "Category updated successfully",
+        "deleted": "Category deleted successfully",
+        "error": "An error occurred"
+      }
+    }
   }
 }
