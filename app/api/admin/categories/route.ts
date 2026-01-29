@@ -13,6 +13,53 @@ export const GET = withPermission(
   async (request: NextRequest) => {
     try {
       const searchParams = request.nextUrl.searchParams;
+      
+      // Check if this is a request for all categories (no pagination)
+      const getAll = searchParams.get("all") === "true";
+      
+      if (getAll) {
+        // Return all categories without pagination
+        const where: Record<string, unknown> = {};
+        
+        if (searchParams.get("search")) {
+          where.OR = [
+            { name: { contains: searchParams.get("search"), mode: "insensitive" } },
+            { slug: { contains: searchParams.get("search"), mode: "insensitive" } },
+          ];
+        }
+        
+        if (searchParams.get("parentId")) {
+          where.parentId = searchParams.get("parentId");
+        }
+        
+        const sortBy = searchParams.get("sortBy") || "name";
+        const sortOrder = searchParams.get("sortOrder") || "asc";
+        const orderBy = { [sortBy]: sortOrder };
+        
+        const categories = await prisma.category.findMany({
+          where,
+          orderBy,
+          include: {
+            parent: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+            _count: {
+              select: {
+                courses: true,
+                children: true,
+              },
+            },
+          },
+        });
+        
+        return NextResponse.json({ data: categories });
+      }
+      
+      // Normal paginated request
       const query = getCategoriesQuerySchema.parse({
         page: searchParams.get("page") || 1,
         limit: searchParams.get("limit") || 10,
@@ -142,7 +189,9 @@ export const POST = withPermission(
         entityType: "Category",
         entityId: category.id,
         entityName: category.name,
-        request,
+        metadata: {
+          parentId: category.parentId,
+        },
       });
 
       return NextResponse.json(

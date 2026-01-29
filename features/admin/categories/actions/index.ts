@@ -38,8 +38,8 @@ export async function getCategoriesAction(query: GetCategoriesQuery) {
  */
 export async function getAllCategoriesAction() {
   try {
-    const response = await http.get<CategoryListResponse>(
-      `/api/admin/categories?limit=1000`
+    const response = await http.get<{ data: CategoryResponse[] }>(
+      `/api/admin/categories?all=true`
     );
     return { success: true as const, data: response.data };
   } catch (error: unknown) {
