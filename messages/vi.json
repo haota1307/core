@@ -1266,6 +1266,105 @@
       "reorderError": "Lỗi sắp xếp lại"
     }
   },
+  "student": {
+    "enrolledCourses": {
+      "title": "Khóa học đã đăng ký",
+      "description": "Xem và quản lý các khóa học bạn đã đăng ký",
+      "table": {
+        "title": "Tiêu đề",
+        "progress": "Tiến độ",
+        "status": "Trạng thái",
+        "enrolledAt": "Ngày đăng ký",
+        "actions": "Thao tác",
+        "view": "Xem",
+        "continue": "Tiếp tục học",
+        "lessons": "bài học",
+        "searchPlaceholder": "Tìm khóa học...",
+        "clearFilters": "Xóa bộ lọc",
+        "columnsToggle": "Cột",
+        "toggleColumns": "Hiển thị cột",
+        "rowsSelected": "hàng đã chọn",
+        "page": "Trang",
+        "previous": "Trước",
+        "next": "Sau",
+        "statuses": {
+          "active": "Đang học",
+          "completed": "Đã hoàn thành",
+          "expired": "Hết hạn",
+          "refunded": "Đã hoàn tiền"
+        },
+        "empty": {
+          "title": "Chưa có khóa học nào"
+        }
+      }
+    },
+    "progress": {
+      "title": "Tiến độ học tập",
+      "description": "Theo dõi tiến độ học tập chi tiết của bạn",
+      "selectCourse": "Chọn khóa học",
+      "selectCourseDescription": "Chọn khóa học để xem tiến độ chi tiết",
+      "selectCoursePlaceholder": "Chọn một khóa học...",
+      "overallProgress": "Tiến độ tổng thể",
+      "progress": "Tiến độ",
+      "lessons": "bài học",
+      "totalDuration": "Tổng thời lượng",
+      "watchedDuration": "Đã xem",
+      "minutes": "phút",
+      "continueLearning": "Tiếp tục học",
+      "noProgress": "Chưa có tiến độ",
+      "noEnrollments": "Bạn chưa đăng ký khóa học nào",
+      "lessonTypes": {
+        "video": "Video",
+        "text": "Văn bản",
+        "quiz": "Câu hỏi",
+        "assignment": "Bài tập",
+        "live": "Trực tiếp"
+      },
+      "free": "Miễn phí",
+      "review": "Ôn tập",
+      "start": "Bắt đầu"
+    },
+    "certificates": {
+      "title": "Chứng chỉ",
+      "description": "Xem và tải xuống các chứng chỉ bạn đã nhận được",
+      "table": {
+        "course": "Khóa học",
+        "certificateNumber": "Số chứng chỉ",
+        "issuedAt": "Ngày cấp",
+        "actions": "Thao tác",
+        "view": "Xem",
+        "download": "Tải xuống",
+        "searchPlaceholder": "Tìm chứng chỉ...",
+        "rowsSelected": "hàng đã chọn",
+        "page": "Trang",
+        "previous": "Trước",
+        "next": "Sau",
+        "empty": {
+          "title": "Chưa có chứng chỉ nào"
+        }
+      }
+    },
+    "wishlist": {
+      "title": "Danh sách yêu thích",
+      "description": "Quản lý các khóa học bạn muốn học sau",
+      "searchPlaceholder": "Tìm khóa học...",
+      "viewCourse": "Xem khóa học",
+      "free": "Miễn phí",
+      "page": "Trang",
+      "previous": "Trước",
+      "next": "Sau",
+      "empty": {
+        "title": "Danh sách yêu thích trống",
+        "description": "Bạn chưa thêm khóa học nào vào danh sách yêu thích"
+      },
+      "messages": {
+        "toggleSuccess": "Đã cập nhật danh sách yêu thích",
+        "toggleError": "Cập nhật danh sách yêu thích thất bại",
+        "removeSuccess": "Đã xóa khỏi danh sách yêu thích",
+        "removeError": "Xóa khỏi danh sách yêu thích thất bại"
+      }
+    }
+  },
   "admin": {
     "courses": {
       "title": "Quản lý khóa học",
