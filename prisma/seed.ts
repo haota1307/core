@@ -163,11 +163,6 @@ const ROLES = [
       "courses.analytics",
       "students.view_own",
       "earnings.view",
-      // Media
-      "media.view",
-      "media.upload",
-      "media.edit",
-      "media.delete",
       // Messages
       "messages.view",
       "messages.send",
@@ -187,9 +182,6 @@ const ROLES = [
       "courses.enroll",
       "courses.enrolled",
       "certificates.view",
-      // Media (basic)
-      "media.view",
-      "media.upload",
       // Reviews
       "reviews.create",
       // Messages

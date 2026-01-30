@@ -8,6 +8,7 @@ import { AuditLogDetailDialog } from "@/features/audit-log/components/audit-log-
 import { createColumns } from "@/features/audit-log/components/audit-log-table/columns";
 import { AuditLogResponse } from "@/features/audit-log/schemas";
 import { useHasPermission } from "@/lib/hooks/use-permissions";
+import { AccessDenied } from "@/components/access-denied";
 
 export default function AuditLogsPage() {
   const tCommon = useTranslations("common");
@@ -73,16 +74,7 @@ export default function AuditLogsPage() {
   }
 
   if (!hasPermission) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold">{tCommon("accessDenied")}</h2>
-          <p className="text-muted-foreground mt-2">
-            {tCommon("noPermission")}
-          </p>
-        </div>
-      </div>
-    );
+    return <AccessDenied />;
   }
 
   return (

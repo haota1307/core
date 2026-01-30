@@ -54,13 +54,27 @@ export function NavMain({ items }: { items: NavigationItem[] }) {
       if (item.permissions && !hasAnyPermission(item.permissions)) return false;
       return true;
     })
-    .map((item) => ({
-      ...item,
+    .map((item) => {
       // Filter sub-items based on permissions
-      items: item.items?.filter((subItem) => canViewSubItem(subItem)),
-    }))
-    // Remove items with no visible sub-items
-    .filter((item) => !item.items || item.items.length > 0);
+      const filteredSubItems = item.items?.filter((subItem) =>
+        canViewSubItem(subItem)
+      );
+
+      return {
+        ...item,
+        items: filteredSubItems,
+      };
+    })
+    // Remove items with sub-items if all sub-items are filtered out
+    // But keep items without sub-items (they can be clicked directly)
+    .filter((item) => {
+      // If item has sub-items, at least one must be visible
+      if (item.items && item.items.length > 0) return true;
+      // If item has no sub-items defined, show it (it's a direct link)
+      if (!item.items) return true;
+      // If item has sub-items but all are filtered out, hide it
+      return false;
+    });
 
   // Show nothing while loading to prevent flash
   if (loading) {

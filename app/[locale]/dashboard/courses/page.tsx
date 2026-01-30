@@ -158,7 +158,7 @@ const AdminCoursesPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("deleteDialog.description", { title: deletingCourse?.title })}
+              {t("deleteDialog.description", { title: deletingCourse?.title ?? "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

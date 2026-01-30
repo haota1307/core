@@ -185,12 +185,12 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
       ],
     },
 
-    // Content Management
+    // Content Management - Admin only
     {
       title: tNavItems("content"),
       url: "/dashboard/content",
       icon: FileText,
-      permissions: ["content.view", "media.view"],
+      permission: "content.manage", // Chỉ admin mới có permission này
       items: [
         {
           title: tNavItems("posts"),
@@ -205,7 +205,7 @@ export const buildNavigationData = (tNavItems: Translate): NavigationData => ({
         {
           title: tNavItems("media"),
           url: "/dashboard/media",
-          permission: "media.view",
+          permission: "media.manage", // Chỉ admin mới có permission này
         },
       ],
     },

@@ -20,6 +20,8 @@
     "success": "Thành công",
     "accessDenied": "Truy cập bị từ chối",
     "noPermission": "Bạn không có quyền truy cập trang này",
+    "goBack": "Quay lại",
+    "goToDashboard": "Về Dashboard",
     "createSubfolder": "Tạo thư mục con",
     "files": "tệp",
     "subFolders": "thư mục con"

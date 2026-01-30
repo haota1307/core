@@ -141,7 +141,7 @@ const CategoriesPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("deleteDialog.description", { name: deletingCategory?.name })}
+              {t("deleteDialog.description", { name: deletingCategory?.name ?? "" })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

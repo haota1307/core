@@ -172,8 +172,8 @@ const PendingCoursesPage = () => {
             </DialogTitle>
             <DialogDescription>
               {reviewAction === "approve"
-                ? t("approveDialog.description", { title: reviewingCourse?.title })
-                : t("rejectDialog.description", { title: reviewingCourse?.title })}
+                ? t("approveDialog.description", { title: reviewingCourse?.title || "" })
+                : t("rejectDialog.description", { title: reviewingCourse?.title || "" })}
             </DialogDescription>
           </DialogHeader>
 

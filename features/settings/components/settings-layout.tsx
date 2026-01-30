@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { useHasPermission } from "@/lib/hooks/use-permissions";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AccessDenied } from "@/components/access-denied";
 
 interface SettingsLayoutProps {
   children: ReactNode;
@@ -26,16 +27,7 @@ export function SettingsLayout({ children }: SettingsLayoutProps) {
 
   // Permission denied
   if (!hasPermission) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold">{tCommon("accessDenied")}</h2>
-          <p className="text-muted-foreground mt-2">
-            {tCommon("noPermission")}
-          </p>
-        </div>
-      </div>
-    );
+    return <AccessDenied />;
   }
 
   return <div className="flex flex-1 flex-col gap-6">{children}</div>;
