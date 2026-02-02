@@ -23,23 +23,39 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { MediaPicker } from "@/features/media/components/media-picker";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { CourseMediaPicker } from "./course-media-picker";
+import { useAllCategories } from "@/features/admin/categories/hooks/use-categories";
 import {
   createCourseSchema,
-  updateCourseSchema,
   CourseResponse,
   CreateCourseInput,
   UpdateCourseInput,
-  CategoryResponse,
 } from "../schemas";
-import { z } from "zod";
 import { useState } from "react";
-import { X, Plus } from "lucide-react";
+import { X, Plus, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+
+// Form values type for the course form
+type CourseFormValues = {
+  title: string;
+  shortDescription?: string;
+  description?: string;
+  thumbnail?: string | null;
+  previewVideo?: string | null;
+  price: number;
+  salePrice?: number | null;
+  currency: string;
+  level: "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "ALL_LEVELS";
+  language: string;
+  categoryId?: string | null;
+  requirements: string[];
+  objectives: string[];
+  targetAudience: string[];
+};
 
 interface CourseFormProps {
   course?: CourseResponse;
-  categories?: CategoryResponse[];
   onSubmit: (data: CreateCourseInput | UpdateCourseInput) => void;
   isLoading?: boolean;
   onCancel?: () => void;
@@ -47,17 +63,21 @@ interface CourseFormProps {
 
 export function CourseForm({
   course,
-  categories = [],
   onSubmit,
   isLoading,
   onCancel,
 }: CourseFormProps) {
   const t = useTranslations("instructor.courseForm");
+  const tCommon = useTranslations("common");
   const isEditMode = !!course;
-  const schema = isEditMode ? updateCourseSchema : createCourseSchema;
 
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  // Fetch categories
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useAllCategories();
+
+  const form = useForm<CourseFormValues>({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(createCourseSchema) as any,
     defaultValues: {
       title: course?.title || "",
       shortDescription: course?.shortDescription || "",
@@ -67,7 +87,12 @@ export function CourseForm({
       price: course?.price || 0,
       salePrice: course?.salePrice || null,
       currency: course?.currency || "VND",
-      level: (course?.level as "BEGINNER" | "INTERMEDIATE" | "ADVANCED" | "ALL_LEVELS") || "ALL_LEVELS",
+      level:
+        (course?.level as
+          | "BEGINNER"
+          | "INTERMEDIATE"
+          | "ADVANCED"
+          | "ALL_LEVELS") || "ALL_LEVELS",
       language: course?.language || "vi",
       categoryId: course?.categoryId || null,
       requirements: course?.requirements || [],
@@ -84,7 +109,7 @@ export function CourseForm({
   const addToArray = (
     fieldName: "requirements" | "objectives" | "targetAudience",
     value: string,
-    setValue: (value: string) => void
+    setValue: (value: string) => void,
   ) => {
     if (value.trim()) {
       const current = form.getValues(fieldName) || [];
@@ -95,12 +120,12 @@ export function CourseForm({
 
   const removeFromArray = (
     fieldName: "requirements" | "objectives" | "targetAudience",
-    index: number
+    index: number,
   ) => {
     const current = form.getValues(fieldName) || [];
     form.setValue(
       fieldName,
-      current.filter((_, i) => i !== index)
+      current.filter((_, i) => i !== index),
     );
   };
 
@@ -157,14 +182,14 @@ export function CourseForm({
               <FormItem>
                 <FormLabel>{t("description")}</FormLabel>
                 <FormControl>
-                  <Textarea
-                    placeholder={t("descriptionPlaceholder")}
-                    {...field}
+                  <RichTextEditor
                     value={field.value || ""}
+                    onChange={field.onChange}
+                    placeholder={t("descriptionPlaceholder")}
                     disabled={isLoading}
-                    rows={6}
                   />
                 </FormControl>
+                <FormDescription>{t("descriptionHint")}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -183,11 +208,13 @@ export function CourseForm({
                 <FormItem>
                   <FormLabel>{t("thumbnail")}</FormLabel>
                   <FormControl>
-                    <MediaPicker
-                      value={field.value || undefined}
+                    <CourseMediaPicker
+                      value={field.value}
                       onChange={field.onChange}
                       accept="image/*"
                       placeholder={t("thumbnailPlaceholder")}
+                      disabled={isLoading}
+                      courseTitle={form.watch("title")}
                     />
                   </FormControl>
                   <FormDescription>{t("thumbnailHint")}</FormDescription>
@@ -203,11 +230,13 @@ export function CourseForm({
                 <FormItem>
                   <FormLabel>{t("previewVideo")}</FormLabel>
                   <FormControl>
-                    <Input
+                    <CourseMediaPicker
+                      value={field.value}
+                      onChange={field.onChange}
+                      accept="video/*"
                       placeholder={t("previewVideoPlaceholder")}
-                      {...field}
-                      value={field.value || ""}
                       disabled={isLoading}
+                      courseTitle={form.watch("title")}
                     />
                   </FormControl>
                   <FormDescription>{t("previewVideoHint")}</FormDescription>
@@ -232,11 +261,18 @@ export function CourseForm({
                   <Select
                     onValueChange={field.onChange}
                     value={field.value || undefined}
-                    disabled={isLoading}
+                    disabled={isLoading || categoriesLoading}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t("categoryPlaceholder")} />
+                        {categoriesLoading ? (
+                          <div className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span>{tCommon("loading")}</span>
+                          </div>
+                        ) : (
+                          <SelectValue placeholder={t("categoryPlaceholder")} />
+                        )}
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -269,10 +305,18 @@ export function CourseForm({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="BEGINNER">{t("levels.beginner")}</SelectItem>
-                      <SelectItem value="INTERMEDIATE">{t("levels.intermediate")}</SelectItem>
-                      <SelectItem value="ADVANCED">{t("levels.advanced")}</SelectItem>
-                      <SelectItem value="ALL_LEVELS">{t("levels.allLevels")}</SelectItem>
+                      <SelectItem value="BEGINNER">
+                        {t("levels.beginner")}
+                      </SelectItem>
+                      <SelectItem value="INTERMEDIATE">
+                        {t("levels.intermediate")}
+                      </SelectItem>
+                      <SelectItem value="ADVANCED">
+                        {t("levels.advanced")}
+                      </SelectItem>
+                      <SelectItem value="ALL_LEVELS">
+                        {t("levels.allLevels")}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -347,12 +391,13 @@ export function CourseForm({
                       {...field}
                       value={field.value ?? ""}
                       onChange={(e) =>
-                        field.onChange(e.target.value ? Number(e.target.value) : null)
+                        field.onChange(
+                          e.target.value ? Number(e.target.value) : null,
+                        )
                       }
                       disabled={isLoading}
                     />
                   </FormControl>
-                  <FormDescription>{t("salePriceHint")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -403,7 +448,11 @@ export function CourseForm({
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        addToArray("requirements", requirementInput, setRequirementInput);
+                        addToArray(
+                          "requirements",
+                          requirementInput,
+                          setRequirementInput,
+                        );
                       }
                     }}
                     disabled={isLoading}
@@ -413,7 +462,11 @@ export function CourseForm({
                     variant="outline"
                     size="icon"
                     onClick={() =>
-                      addToArray("requirements", requirementInput, setRequirementInput)
+                      addToArray(
+                        "requirements",
+                        requirementInput,
+                        setRequirementInput,
+                      )
                     }
                     disabled={isLoading}
                   >
@@ -457,7 +510,11 @@ export function CourseForm({
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        addToArray("objectives", objectiveInput, setObjectiveInput);
+                        addToArray(
+                          "objectives",
+                          objectiveInput,
+                          setObjectiveInput,
+                        );
                       }
                     }}
                     disabled={isLoading}
@@ -467,7 +524,11 @@ export function CourseForm({
                     variant="outline"
                     size="icon"
                     onClick={() =>
-                      addToArray("objectives", objectiveInput, setObjectiveInput)
+                      addToArray(
+                        "objectives",
+                        objectiveInput,
+                        setObjectiveInput,
+                      )
                     }
                     disabled={isLoading}
                   >
@@ -511,7 +572,11 @@ export function CourseForm({
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
-                        addToArray("targetAudience", audienceInput, setAudienceInput);
+                        addToArray(
+                          "targetAudience",
+                          audienceInput,
+                          setAudienceInput,
+                        );
                       }
                     }}
                     disabled={isLoading}
@@ -521,7 +586,11 @@ export function CourseForm({
                     variant="outline"
                     size="icon"
                     onClick={() =>
-                      addToArray("targetAudience", audienceInput, setAudienceInput)
+                      addToArray(
+                        "targetAudience",
+                        audienceInput,
+                        setAudienceInput,
+                      )
                     }
                     disabled={isLoading}
                   >
@@ -569,4 +638,3 @@ export function CourseForm({
     </Form>
   );
 }
-

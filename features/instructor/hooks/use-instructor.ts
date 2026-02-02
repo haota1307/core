@@ -10,6 +10,7 @@ import {
   updateCourseAction,
   deleteCourseAction,
   submitCourseForReviewAction,
+  duplicateCourseAction,
   getCourseSectionsAction,
   createSectionAction,
   updateSectionAction,
@@ -35,25 +36,49 @@ import {
   GetEarningsQuery,
 } from "../schemas";
 
+// Type for action result with error code
+interface ActionError {
+  error: string;
+  code?: string;
+  errors?: string[];
+}
+
+// Custom error class to carry error code
+class ActionResultError extends Error {
+  code?: string;
+  errors?: string[];
+
+  constructor(result: ActionError) {
+    super(result.error);
+    this.code = result.code;
+    this.errors = result.errors;
+  }
+}
+
 // ==================== QUERY KEYS ====================
 
 export const instructorKeys = {
   all: ["instructor"] as const,
-  
+
   // Courses
   courses: () => [...instructorKeys.all, "courses"] as const,
-  courseList: (query: GetCoursesQuery) => [...instructorKeys.courses(), "list", query] as const,
-  courseDetail: (id: string) => [...instructorKeys.courses(), "detail", id] as const,
-  courseSections: (courseId: string) => [...instructorKeys.courses(), courseId, "sections"] as const,
-  
+  courseList: (query: GetCoursesQuery) =>
+    [...instructorKeys.courses(), "list", query] as const,
+  courseDetail: (id: string) =>
+    [...instructorKeys.courses(), "detail", id] as const,
+  courseSections: (courseId: string) =>
+    [...instructorKeys.courses(), courseId, "sections"] as const,
+
   // Students
   students: () => [...instructorKeys.all, "students"] as const,
-  studentList: (query: GetStudentsQuery) => [...instructorKeys.students(), "list", query] as const,
-  
+  studentList: (query: GetStudentsQuery) =>
+    [...instructorKeys.students(), "list", query] as const,
+
   // Earnings
   earnings: () => [...instructorKeys.all, "earnings"] as const,
-  earningsSummary: (query: GetEarningsQuery) => [...instructorKeys.earnings(), "summary", query] as const,
-  
+  earningsSummary: (query: GetEarningsQuery) =>
+    [...instructorKeys.earnings(), "summary", query] as const,
+
   // Analytics
   analytics: () => [...instructorKeys.all, "analytics"] as const,
 };
@@ -65,7 +90,7 @@ export const instructorKeys = {
  */
 export function useInstructorCourses(
   query: GetCoursesQuery,
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean },
 ) {
   return useQuery({
     queryKey: instructorKeys.courseList(query),
@@ -104,12 +129,13 @@ export function useCourse(id: string) {
 export function useCreateCourse() {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (input: CreateCourseInput) => {
       const result = await createCourseAction(input);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -118,7 +144,13 @@ export function useCreateCourse() {
       toast.success(t("courseCreated"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("courseCreateError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("courseCreateError"));
+      }
     },
   });
 }
@@ -129,22 +161,31 @@ export function useCreateCourse() {
 export function useUpdateCourse(id: string) {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (input: UpdateCourseInput) => {
       const result = await updateCourseAction(id, input);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: instructorKeys.courses() });
-      queryClient.invalidateQueries({ queryKey: instructorKeys.courseDetail(id) });
+      queryClient.invalidateQueries({
+        queryKey: instructorKeys.courseDetail(id),
+      });
       toast.success(t("courseUpdated"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("courseUpdateError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("courseUpdateError"));
+      }
     },
   });
 }
@@ -155,12 +196,13 @@ export function useUpdateCourse(id: string) {
 export function useDeleteCourse() {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (id: string) => {
       const result = await deleteCourseAction(id);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -169,7 +211,13 @@ export function useDeleteCourse() {
       toast.success(t("courseDeleted"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("courseDeleteError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("courseDeleteError"));
+      }
     },
   });
 }
@@ -180,22 +228,71 @@ export function useDeleteCourse() {
 export function useSubmitCourseForReview() {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (id: string) => {
       const result = await submitCourseForReviewAction(id);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: instructorKeys.courses() });
-      queryClient.invalidateQueries({ queryKey: instructorKeys.courseDetail(id) });
+      queryClient.invalidateQueries({
+        queryKey: instructorKeys.courseDetail(id),
+      });
       toast.success(t("courseSubmitted"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("courseSubmitError"));
+      if (error instanceof ActionResultError && error.code) {
+        // For validation errors, show all missing requirements
+        if (error.code === "VALIDATION_ERROR" && error.errors?.length) {
+          const errorMessages = error.errors.map((code) =>
+            tErrors(code as keyof IntlMessages["instructor"]["errors"]),
+          );
+          toast.error(errorMessages.join("\n"));
+        } else {
+          toast.error(
+            tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+          );
+        }
+      } else {
+        toast.error(error.message || t("courseSubmitError"));
+      }
+    },
+  });
+}
+
+/**
+ * Hook nhân bản khóa học
+ */
+export function useDuplicateCourse() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const result = await duplicateCourseAction(id);
+      if (!result.success) {
+        throw new ActionResultError(result);
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: instructorKeys.courses() });
+      toast.success(t("courseDuplicated"));
+    },
+    onError: (error: Error) => {
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("courseDuplicateError"));
+      }
     },
   });
 }
@@ -225,12 +322,13 @@ export function useCourseSections(courseId: string) {
 export function useCreateSection() {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (input: CreateSectionInput) => {
       const result = await createSectionAction(input);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -241,7 +339,13 @@ export function useCreateSection() {
       toast.success(t("sectionCreated"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("sectionCreateError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("sectionCreateError"));
+      }
     },
   });
 }
@@ -252,12 +356,19 @@ export function useCreateSection() {
 export function useUpdateSection(courseId: string) {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
-    mutationFn: async ({ id, input }: { id: string; input: UpdateSectionInput }) => {
+    mutationFn: async ({
+      id,
+      input,
+    }: {
+      id: string;
+      input: UpdateSectionInput;
+    }) => {
       const result = await updateSectionAction(id, input);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -268,7 +379,13 @@ export function useUpdateSection(courseId: string) {
       toast.success(t("sectionUpdated"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("sectionUpdateError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("sectionUpdateError"));
+      }
     },
   });
 }
@@ -279,12 +396,13 @@ export function useUpdateSection(courseId: string) {
 export function useDeleteSection(courseId: string) {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (id: string) => {
       const result = await deleteSectionAction(id);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -295,7 +413,13 @@ export function useDeleteSection(courseId: string) {
       toast.success(t("sectionDeleted"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("sectionDeleteError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("sectionDeleteError"));
+      }
     },
   });
 }
@@ -306,12 +430,13 @@ export function useDeleteSection(courseId: string) {
 export function useReorderSections(courseId: string) {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (sectionIds: string[]) => {
       const result = await reorderSectionsAction(courseId, sectionIds);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -321,7 +446,13 @@ export function useReorderSections(courseId: string) {
       });
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("reorderError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("reorderError"));
+      }
     },
   });
 }
@@ -334,12 +465,13 @@ export function useReorderSections(courseId: string) {
 export function useCreateLesson(courseId: string) {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (input: CreateLessonInput) => {
       const result = await createLessonAction(input);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -350,7 +482,13 @@ export function useCreateLesson(courseId: string) {
       toast.success(t("lessonCreated"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("lessonCreateError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("lessonCreateError"));
+      }
     },
   });
 }
@@ -361,12 +499,19 @@ export function useCreateLesson(courseId: string) {
 export function useUpdateLesson(courseId: string) {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
-    mutationFn: async ({ id, input }: { id: string; input: UpdateLessonInput }) => {
+    mutationFn: async ({
+      id,
+      input,
+    }: {
+      id: string;
+      input: UpdateLessonInput;
+    }) => {
       const result = await updateLessonAction(id, input);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -377,7 +522,13 @@ export function useUpdateLesson(courseId: string) {
       toast.success(t("lessonUpdated"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("lessonUpdateError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("lessonUpdateError"));
+      }
     },
   });
 }
@@ -388,12 +539,13 @@ export function useUpdateLesson(courseId: string) {
 export function useDeleteLesson(courseId: string) {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (id: string) => {
       const result = await deleteLessonAction(id);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -404,7 +556,13 @@ export function useDeleteLesson(courseId: string) {
       toast.success(t("lessonDeleted"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("lessonDeleteError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("lessonDeleteError"));
+      }
     },
   });
 }
@@ -415,12 +573,13 @@ export function useDeleteLesson(courseId: string) {
 export function useReorderLessons(courseId: string, sectionId: string) {
   const queryClient = useQueryClient();
   const t = useTranslations("instructor.messages");
+  const tErrors = useTranslations("instructor.errors");
 
   return useMutation({
     mutationFn: async (lessonIds: string[]) => {
       const result = await reorderLessonsAction(sectionId, lessonIds);
       if (!result.success) {
-        throw new Error(result.error);
+        throw new ActionResultError(result);
       }
       return result;
     },
@@ -430,7 +589,13 @@ export function useReorderLessons(courseId: string, sectionId: string) {
       });
     },
     onError: (error: Error) => {
-      toast.error(error.message || t("reorderError"));
+      if (error instanceof ActionResultError && error.code) {
+        toast.error(
+          tErrors(error.code as keyof IntlMessages["instructor"]["errors"]),
+        );
+      } else {
+        toast.error(error.message || t("reorderError"));
+      }
     },
   });
 }
@@ -442,7 +607,7 @@ export function useReorderLessons(courseId: string, sectionId: string) {
  */
 export function useInstructorStudents(
   query: GetStudentsQuery,
-  options?: { enabled?: boolean }
+  options?: { enabled?: boolean },
 ) {
   return useQuery({
     queryKey: instructorKeys.studentList(query),
@@ -495,4 +660,3 @@ export function useInstructorAnalytics() {
     staleTime: 60 * 1000, // 1 minute
   });
 }
-

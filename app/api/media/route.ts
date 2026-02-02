@@ -5,20 +5,24 @@ import { GetMediaQuerySchema } from "@/features/media/schemas";
 
 export const GET = withPermission(
   "media.view",
-  async (request: NextRequest) => {
+  async (request: NextRequest, _context, authContext) => {
     try {
-
       // Parse query params
       const { searchParams } = new URL(request.url);
       const folderId = searchParams.get("folderId");
-      
+      const onlyMine = searchParams.get("onlyMine") === "true";
+
       const queryParams = {
         page: parseInt(searchParams.get("page") || "1"),
         limit: parseInt(searchParams.get("limit") || "20"),
         search: searchParams.get("search") || undefined,
         mimeType: searchParams.get("mimeType") || undefined,
-        folderId: folderId !== null ? (folderId === "" ? null : folderId) : undefined,
-        sortBy: (searchParams.get("sortBy") || "createdAt") as "createdAt" | "size" | "originalName",
+        folderId:
+          folderId !== null ? (folderId === "" ? null : folderId) : undefined,
+        sortBy: (searchParams.get("sortBy") || "createdAt") as
+          | "createdAt"
+          | "size"
+          | "originalName",
         sortOrder: (searchParams.get("sortOrder") || "desc") as "asc" | "desc",
       };
 
@@ -30,6 +34,11 @@ export const GET = withPermission(
         deletedAt: null,
       };
 
+      // Filter only user's own media
+      if (onlyMine && authContext?.user?.id) {
+        where.uploadedBy = authContext.user.id;
+      }
+
       // Folder filter
       if (validatedQuery.folderId !== undefined) {
         where.folderId = validatedQuery.folderId;
@@ -38,9 +47,19 @@ export const GET = withPermission(
       // Search filter
       if (validatedQuery.search) {
         where.OR = [
-          { originalName: { contains: validatedQuery.search, mode: "insensitive" } },
+          {
+            originalName: {
+              contains: validatedQuery.search,
+              mode: "insensitive",
+            },
+          },
           { title: { contains: validatedQuery.search, mode: "insensitive" } },
-          { description: { contains: validatedQuery.search, mode: "insensitive" } },
+          {
+            description: {
+              contains: validatedQuery.search,
+              mode: "insensitive",
+            },
+          },
         ];
       }
 
@@ -89,16 +108,19 @@ export const GET = withPermission(
 
       if (error.name === "ZodError") {
         return NextResponse.json(
-          { code: "VALIDATION_ERROR", message: "Invalid query parameters", errors: error.errors },
-          { status: 400 }
+          {
+            code: "VALIDATION_ERROR",
+            message: "Invalid query parameters",
+            errors: error.errors,
+          },
+          { status: 400 },
         );
       }
 
       return NextResponse.json(
         { code: "SERVER_ERROR", message: "Internal server error" },
-        { status: 500 }
+        { status: 500 },
       );
     }
-  }
+  },
 );
-

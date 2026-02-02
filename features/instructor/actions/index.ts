@@ -1,4 +1,4 @@
-import { http } from "@/lib/http";
+import { http, HttpError } from "@/lib/http";
 import {
   CreateCourseInput,
   UpdateCourseInput,
@@ -17,6 +17,30 @@ import {
   EarningsSummaryResponse,
   InstructorAnalyticsResponse,
 } from "../schemas";
+
+// Helper type for action results
+type ActionResult<T> =
+  | { success: true; data: T; message?: string }
+  | { success: false; error: string; code?: string; errors?: string[] };
+
+// Helper to extract error info from HttpError
+function getErrorInfo(error: unknown): {
+  message: string;
+  code?: string;
+  errors?: string[];
+} {
+  if (error instanceof HttpError) {
+    return {
+      message: error.message,
+      code: error.code,
+      errors: error.errors,
+    };
+  }
+  return {
+    message:
+      error instanceof Error ? error.message : "An unexpected error occurred",
+  };
+}
 
 // ==================== COURSE ACTIONS ====================
 
@@ -42,11 +66,12 @@ export async function getInstructorCoursesAction(query: GetCoursesQuery) {
     if (query.sortOrder) params.append("sortOrder", query.sortOrder);
 
     const response = await http.get<CourseListResponse>(
-      `/api/instructor/courses?${params.toString()}`
+      `/api/instructor/courses?${params.toString()}`,
     );
     return { success: true, data: response };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to fetch courses";
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch courses";
     return { success: false, error: message };
   }
 }
@@ -57,11 +82,12 @@ export async function getInstructorCoursesAction(query: GetCoursesQuery) {
 export async function getCourseAction(id: string) {
   try {
     const response = await http.get<{ data: CourseResponse }>(
-      `/api/instructor/courses/${id}`
+      `/api/instructor/courses/${id}`,
     );
     return { success: true, data: response.data };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to fetch course";
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch course";
     return { success: false, error: message };
   }
 }
@@ -77,8 +103,8 @@ export async function createCourseAction(input: CreateCourseInput) {
     }>("/api/instructor/courses", input);
     return { success: true, data: response.data, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to create course";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -93,8 +119,8 @@ export async function updateCourseAction(id: string, input: UpdateCourseInput) {
     }>(`/api/instructor/courses/${id}`, input);
     return { success: true, data: response.data, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to update course";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -104,12 +130,12 @@ export async function updateCourseAction(id: string, input: UpdateCourseInput) {
 export async function deleteCourseAction(id: string) {
   try {
     const response = await http.delete<{ message: string }>(
-      `/api/instructor/courses/${id}`
+      `/api/instructor/courses/${id}`,
     );
     return { success: true, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to delete course";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -124,8 +150,29 @@ export async function submitCourseForReviewAction(id: string) {
     }>(`/api/instructor/courses/${id}/submit`);
     return { success: true, data: response.data, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to submit course";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return {
+      success: false,
+      error: errorInfo.message,
+      code: errorInfo.code,
+      errors: errorInfo.errors,
+    };
+  }
+}
+
+/**
+ * Nhân bản khóa học
+ */
+export async function duplicateCourseAction(id: string) {
+  try {
+    const response = await http.post<{
+      data: { id: string; title: string; slug: string };
+      message: string;
+    }>(`/api/instructor/courses/${id}/duplicate`);
+    return { success: true, data: response.data, message: response.message };
+  } catch (error: unknown) {
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -137,11 +184,12 @@ export async function submitCourseForReviewAction(id: string) {
 export async function getCourseSectionsAction(courseId: string) {
   try {
     const response = await http.get<{ data: SectionResponse[] }>(
-      `/api/instructor/courses/${courseId}/sections`
+      `/api/instructor/courses/${courseId}/sections`,
     );
     return { success: true, data: response.data };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to fetch sections";
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch sections";
     return { success: false, error: message };
   }
 }
@@ -157,15 +205,18 @@ export async function createSectionAction(input: CreateSectionInput) {
     }>(`/api/instructor/courses/${input.courseId}/sections`, input);
     return { success: true, data: response.data, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to create section";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
 /**
  * Cập nhật section
  */
-export async function updateSectionAction(id: string, input: UpdateSectionInput) {
+export async function updateSectionAction(
+  id: string,
+  input: UpdateSectionInput,
+) {
   try {
     const response = await http.patch<{
       data: SectionResponse;
@@ -173,8 +224,8 @@ export async function updateSectionAction(id: string, input: UpdateSectionInput)
     }>(`/api/instructor/sections/${id}`, input);
     return { success: true, data: response.data, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to update section";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -184,12 +235,12 @@ export async function updateSectionAction(id: string, input: UpdateSectionInput)
 export async function deleteSectionAction(id: string) {
   try {
     const response = await http.delete<{ message: string }>(
-      `/api/instructor/sections/${id}`
+      `/api/instructor/sections/${id}`,
     );
     return { success: true, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to delete section";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -198,17 +249,17 @@ export async function deleteSectionAction(id: string) {
  */
 export async function reorderSectionsAction(
   courseId: string,
-  sectionIds: string[]
+  sectionIds: string[],
 ) {
   try {
     const response = await http.post<{ message: string }>(
       `/api/instructor/courses/${courseId}/sections/reorder`,
-      { sectionIds }
+      { sectionIds },
     );
     return { success: true, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to reorder sections";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -225,8 +276,8 @@ export async function createLessonAction(input: CreateLessonInput) {
     }>(`/api/instructor/sections/${input.sectionId}/lessons`, input);
     return { success: true, data: response.data, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to create lesson";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -241,8 +292,8 @@ export async function updateLessonAction(id: string, input: UpdateLessonInput) {
     }>(`/api/instructor/lessons/${id}`, input);
     return { success: true, data: response.data, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to update lesson";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -252,12 +303,12 @@ export async function updateLessonAction(id: string, input: UpdateLessonInput) {
 export async function deleteLessonAction(id: string) {
   try {
     const response = await http.delete<{ message: string }>(
-      `/api/instructor/lessons/${id}`
+      `/api/instructor/lessons/${id}`,
     );
     return { success: true, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to delete lesson";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -266,17 +317,17 @@ export async function deleteLessonAction(id: string) {
  */
 export async function reorderLessonsAction(
   sectionId: string,
-  lessonIds: string[]
+  lessonIds: string[],
 ) {
   try {
     const response = await http.post<{ message: string }>(
       `/api/instructor/sections/${sectionId}/lessons/reorder`,
-      { lessonIds }
+      { lessonIds },
     );
     return { success: true, message: response.message };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to reorder lessons";
-    return { success: false, error: message };
+    const errorInfo = getErrorInfo(error);
+    return { success: false, error: errorInfo.message, code: errorInfo.code };
   }
 }
 
@@ -297,11 +348,12 @@ export async function getInstructorStudentsAction(query: GetStudentsQuery) {
     if (query.sortOrder) params.append("sortOrder", query.sortOrder);
 
     const response = await http.get<StudentListResponse>(
-      `/api/instructor/students?${params.toString()}`
+      `/api/instructor/students?${params.toString()}`,
     );
     return { success: true, data: response };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to fetch students";
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch students";
     return { success: false, error: message };
   }
 }
@@ -318,11 +370,12 @@ export async function getInstructorEarningsAction(query: GetEarningsQuery) {
     if (query.month) params.append("month", query.month.toString());
 
     const response = await http.get<EarningsSummaryResponse>(
-      `/api/instructor/earnings?${params.toString()}`
+      `/api/instructor/earnings?${params.toString()}`,
     );
     return { success: true, data: response };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to fetch earnings";
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch earnings";
     return { success: false, error: message };
   }
 }
@@ -335,12 +388,12 @@ export async function getInstructorEarningsAction(query: GetEarningsQuery) {
 export async function getInstructorAnalyticsAction() {
   try {
     const response = await http.get<InstructorAnalyticsResponse>(
-      `/api/instructor/analytics`
+      `/api/instructor/analytics`,
     );
     return { success: true, data: response };
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : "Failed to fetch analytics";
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch analytics";
     return { success: false, error: message };
   }
 }
-

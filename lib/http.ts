@@ -45,12 +45,18 @@ export type RequestOptions<TBody = unknown> = Omit<
 
 export class HttpError<T = unknown> extends Error {
   status: number;
+  code?: string;
   data?: T;
+  errors?: string[];
 
   constructor(status: number, message: string, data?: T) {
     super(message);
     this.status = status;
     this.data = data;
+    // Extract error code from API response
+    this.code = (data as { code?: string })?.code;
+    // Extract validation errors array from API response
+    this.errors = (data as { errors?: string[] })?.errors;
   }
 }
 
@@ -75,12 +81,12 @@ const shouldParseJson = (response: Response) => {
 const buildUrl = (
   baseUrl: string | undefined,
   path: string,
-  query?: Record<string, QueryValue>
+  query?: Record<string, QueryValue>,
 ) => {
   const origin =
     typeof window !== "undefined"
       ? window.location.origin
-      : process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+      : (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000");
 
   const url =
     path.startsWith("http://") || path.startsWith("https://")
@@ -114,7 +120,7 @@ export const createHttpClient = (config: HttpClientConfig) => {
   const request = async <TResponse = unknown, TBody = unknown>(
     path: string,
     options: RequestOptions<TBody> = {},
-    retrying = false
+    retrying = false,
   ): Promise<TResponse> => {
     const {
       method = "GET",
@@ -139,14 +145,14 @@ export const createHttpClient = (config: HttpClientConfig) => {
           console.log(
             `[HTTP Client] Token found and added to request: ${path.substring(
               0,
-              20
-            )}...`
+              20,
+            )}...`,
           );
         } else {
           console.warn(
             `[HTTP Client] No access token found for request to: ${path}. Cookies: ${
               document.cookie ? "present" : "missing"
-            }`
+            }`,
           );
         }
       }
@@ -176,7 +182,7 @@ export const createHttpClient = (config: HttpClientConfig) => {
     }
 
     const errorPayload = await parseResponse<unknown>(response).catch(
-      () => undefined
+      () => undefined,
     );
 
     // 401 = token invalid/expired, should try refresh
@@ -212,21 +218,21 @@ export const createHttpClient = (config: HttpClientConfig) => {
     post: <TResponse = unknown, TBody = unknown>(
       path: string,
       body?: TBody,
-      opts?: RequestOptions<TBody>
+      opts?: RequestOptions<TBody>,
     ) => request<TResponse, TBody>(path, { ...opts, method: "POST", body }),
     put: <TResponse = unknown, TBody = unknown>(
       path: string,
       body?: TBody,
-      opts?: RequestOptions<TBody>
+      opts?: RequestOptions<TBody>,
     ) => request<TResponse, TBody>(path, { ...opts, method: "PUT", body }),
     patch: <TResponse = unknown, TBody = unknown>(
       path: string,
       body?: TBody,
-      opts?: RequestOptions<TBody>
+      opts?: RequestOptions<TBody>,
     ) => request<TResponse, TBody>(path, { ...opts, method: "PATCH", body }),
     delete: <TResponse = unknown, TBody = unknown>(
       path: string,
-      opts?: RequestOptions<TBody>
+      opts?: RequestOptions<TBody>,
     ) => request<TResponse, TBody>(path, { ...opts, method: "DELETE" }),
   };
 };
